@@ -44,44 +44,45 @@ tokens = [
 ]
 
 reservadas = {
-    'i64': 'i64',
-    'f64': 'f64',
-    'bool': 'bool',
-    'char': 'char',
-    'string': 'String',
-    #'&str': 'str',
-    'usize': 'usize',
-    'let': 'let',
-    'mut': 'mut',
-    'struct': 'struct',
-    'as': 'as',
-    'println!': 'println',
-    'true': 'true',
-    'false': 'false',
-    'fn': 'fn',
-    'abs': 'abs',
-    'sqrt': 'sqrt',
-    'to_string': 'tostring',
-    'clone': 'clone',
-    'new': 'new',
-    'len': 'len',
-    'push': 'push',
-    'remove': 'remove',
-    'contains': 'contains',
-    'insert': 'insert',
-    'capacity': 'capacity',
-    'with_capacity': 'withcapacity',
-    'return': 'return',
-    'continue': 'continue',
-    'break': 'break',
-    'main': 'main',
-    'if': 'if',
-    'else': 'else',
-    'else if': 'elseif',
-    'while': 'while',
-    'loop': 'loop',
-    'i64::pow': 'i64pow',
-    'f64::powf': 'i64powf'
+    'i64': 'I64',
+    'f64': 'F64',
+    'bool': 'BOOL',
+    'char': 'CHAR',
+    'String': 'STRING',
+    'usize': 'USIZE',
+    'let': 'LET',
+    'mut': 'MUT',
+    'struct': 'STRUCT',
+    'as': 'AS',
+    'println': 'PRINTLN',
+    'true': 'TRUE',
+    'false': 'FALSE',
+    'fn': 'FN',
+    'abs': 'ABS',
+    'sqrt': 'SQRT',
+    'clone': 'CLONE',
+    'new': 'NEW',
+    'len': 'LEN',
+    'push': 'PUSH',
+    'remove': 'REMOVE',
+    'contains': 'CONTAINS',
+    'insert': 'INSERT',
+    'capacity': 'CAPACITY',
+    'with_capacity': 'WITH_CAPACITY',
+    'to_owned': 'TO_OWNED',
+    'to_string': 'TO_STRING',
+    'return': 'RETURN',
+    'continue': 'CONTINUE',
+    'break': 'BREAK',
+    'main': 'MAIN',
+    'if': 'IF',
+    'else': 'ELSE',
+    'while': 'WHILE',
+    'loop': 'LOOP',
+    'match': 'MATCH',
+    'pow': 'POW',
+    'powf': 'POWF',
+    'Vec': 'VEC'
 }
 
 tokens = tokens+list(reservadas.values())
@@ -139,8 +140,8 @@ def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
     if t.value in reservadas:
         t.value = t.value
-        t.type = reservadas.get(t.value.lower(), 'ID')
-        print(f'tvalue: {t.value}, ttype: {t.type}')
+        t.type = reservadas.get(t.value, 'ID')
+        #print(f'tvalue: {t.value}, ttype: {t.type}')
     return t
 
 def t_COMENT(t):
@@ -174,12 +175,14 @@ precedence = (
     ('right','UMENOS'),
     )
 
-f = open("./entrada1.txt", "r")
-input = f.read()
 analizador = lex.lex()
-analizador.input(input)
 
-while True:
-	tok = analizador.token()
-	if not tok : break
-	print(tok)
+if __name__ == '__main__':
+    f = open("./entrada1.txt", "r")
+    input = f.read()
+    analizador.input(input)
+
+    while True:
+        tok = analizador.token()
+        if not tok : break
+        print(tok)
