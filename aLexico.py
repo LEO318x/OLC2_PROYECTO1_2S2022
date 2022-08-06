@@ -32,14 +32,14 @@ tokens = [
     'MOD',
     'BARVER',
     'AMP',
-    'ADM',
+    'NOT',
     'RQUEST',
     'MYRIGUAL',
     'MNRIGUAL',
-    'DOBIGUAL',
-    'ADMIGUAL',
-    'DOBARVER',
-    'DOBAMP',
+    'IGUALACION',
+    'DISTINTO',
+    'OR',
+    'AND',
     'RSTR'
 ]
 
@@ -109,14 +109,14 @@ t_PUNTO = r'\.'
 t_IGUAL = r'='
 t_BARVER = r'\|'
 t_AMP = r'&'
-t_ADM = r'!'
+t_NOT = r'!'
 t_RQUEST = r'\?'
 t_MYRIGUAL = r'>='
 t_MNRIGUAL = r'<='
-t_DOBIGUAL = r'=='
-t_ADMIGUAL = r'!='
-t_DOBARVER = r'\|\|'
-t_DOBAMP = r'&&'
+t_IGUALACION = r'=='
+t_DISTINTO = r'!='
+t_OR = r'\|\|'
+t_AND = r'&&'
 
 def t_DECIMAL(t):
     r'\d+\.\d+'
@@ -163,6 +163,10 @@ def t_CHARLIT(t):
     r'\'.*?\''
     t.value = t.value[1:-1] # remuevo las comillas simples
     return t
+
+def find_column(inp, tk):
+    line_start = inp.rfind('\n', 0, tk.lexpos) + 1
+    return (tk.lexpos - line_start) + 1
 
 def t_error(t):
     print("caracter ilegal '%s'" % t.value[0])
