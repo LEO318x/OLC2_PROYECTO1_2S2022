@@ -78,7 +78,9 @@ class Ventana:
     def fncAnalizar(self):
         self.txtSalida.delete(1.0, tkinter.END)
         txt = self.txtEntrada.get('1.0', 'end-1c')
-        self.txtSalida.insert(tkinter.END, txt)
+        from aSintactico import analizar
+        analizar(txt)
+        #self.txtSalida.insert(tkinter.END, txt)
 
     @staticmethod
     def acerca_de():
