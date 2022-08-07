@@ -13,6 +13,7 @@ class TIPO_DATO(Enum):
     VECT = 9
     BREAK = 10
     CONTINUE = 11
+    RSTR = 12
 
 class TIPO_OPERACION(Enum):
     SUMA = 1

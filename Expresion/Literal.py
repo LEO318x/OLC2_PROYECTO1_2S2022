@@ -18,10 +18,18 @@ class Literal(Expresion):
             return Retorno(self.valor, TIPO_DATO.FLOAT)
         elif self.tipo == TIPO_DATO.STRING:
             return Retorno(self.valor, TIPO_DATO.STRING)
+        elif self.tipo == TIPO_DATO.RSTR:
+            return Retorno(self.valor, TIPO_DATO.RSTR)
+        elif self.tipo == TIPO_DATO.CHAR:
+            if len(self.valor) > 1:
+                tmpchar = self.valor
+                print(f'Error_Lit: Char no puede ser > 1')
+                return Retorno(tmpchar[0:1], TIPO_DATO.CHAR)
+            else:
+                return Retorno(self.valor, TIPO_DATO.CHAR)
         elif self.tipo == TIPO_DATO.BOOL:
             if self.valor == 'true':
                 self.valor = True
             elif self.valor == 'false':
                 self.valor = False
-
             return Retorno(self.valor, TIPO_DATO.BOOL)

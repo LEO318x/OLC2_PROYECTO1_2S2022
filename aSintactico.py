@@ -2,7 +2,8 @@ import ply.yacc as yacc
 from Expresion.Acceso import Acceso
 from Expresion.Logica import Logica
 from Expresion.Relacional import Relacional
-from Instruccion.Declaracion import Declaracion
+from Instruccion.Asignacion import Asignacion
+from Instruccion.Declaracion import Declaracion, Declaracion_Tipo
 from Nativas.Exponente import Exponente
 from Simbolo.Entorno import Entorno
 from aLexico import tokens, analizador, find_column
@@ -39,16 +40,57 @@ def p_instrucciones_instruccion(t):
 
 def p_instruccion(t):
     '''instruccion : declaracion
+                  | declaracion_con_tipo
+                  | asignacion
                   | print_inst'''
     t[0] = t[1]
 
 def p_declaracion(t):
-    '''declaracion : LET ID IGUAL expresion PTOCOMA'''
-    t[0] = Declaracion(t[2], t[4], False, t.lineno(3), find_column(input, t.slice[3]))
+    '''declaracion : LET ID IGUAL expresion PTOCOMA
+                   | LET MUT ID IGUAL expresion PTOCOMA'''
+    if t.slice[2].type == 'MUT':
+        t[0] = Declaracion(t[3], t[5], True, t.lineno(4), find_column(input, t.slice[4]))
+    else:
+        t[0] = Declaracion(t[2], t[4], False, t.lineno(3), find_column(input, t.slice[3]))
+
+def p_declaracion_con_tipo(t):
+    '''declaracion_con_tipo : LET ID DOSPTOS tipo_dato IGUAL expresion PTOCOMA
+                            | LET MUT ID DOSPTOS tipo_dato IGUAL expresion PTOCOMA'''
+    if t.slice[2].type == 'MUT':
+        t[0] = Declaracion_Tipo(t[3], t[7], t[5], True, t.lineno(6), find_column(input, t.slice[6]))
+    else:
+        t[0] = Declaracion_Tipo(t[2], t[6], t[4], False, t.lineno(5), find_column(input, t.slice[5]))
+
+def p_tipo_dato(t):
+    '''tipo_dato : I64
+                 | F64
+                 | STRING
+                 | RSTR
+                 | CHAR
+                 | BOOL'''
+    tipo = ""
+    match t[1]:
+        case 'i64':
+            tipo = TIPO_DATO.INTEGER
+        case 'f64':
+            tipo = TIPO_DATO.FLOAT
+        case 'bool':
+            tipo = TIPO_DATO.BOOL
+        case 'String':
+            tipo = TIPO_DATO.STRING
+        case '&str':
+            tipo = TIPO_DATO.RSTR
+        case 'char':
+            tipo = TIPO_DATO.CHAR
+    t[0] = tipo
+
+def p_asignacion(t):
+    '''asignacion : ID IGUAL expresion PTOCOMA'''
+    t[0] = Asignacion(t[1], t[3], t.lineno(1), find_column(input, t.slice[1]))
 
 def p_print(t):
-    'print_inst : PRINTLN IPAR expresion DPAR'
-    instr = Print(t[3])
+    'print_inst : PRINTLN NOT IPAR expresion DPAR PTOCOMA'
+    instr = Print(t[4])
     t[0] = instr
 
 
@@ -124,6 +166,7 @@ def p_expresion_primitiva(t):
                 | DECIMAL
                 | ID
                 | STRLIT
+                | CHARLIT
                 | TRUE
                 | FALSE '''
     #print(f'gtipo: {t.slice[1].type}, gvalor {t[1]}')
@@ -135,7 +178,9 @@ def p_expresion_primitiva(t):
     elif t.slice[1].type == 'ID':
         t[0] = Acceso(t[1], t.lineno(1), find_column(input, t.slice[1]))
     elif t.slice[1].type == 'STRLIT':
-        t[0] = Literal(t[1], TIPO_DATO.STRING, t.lineno(1), find_column(input, t.slice[1]))
+        t[0] = Literal(t[1], TIPO_DATO.RSTR, t.lineno(1), find_column(input, t.slice[1]))
+    elif t.slice[1].type == 'CHARLIT':
+        t[0] = Literal(t[1], TIPO_DATO.CHAR, t.lineno(1), find_column(input, t.slice[1]))
     elif t.slice[1].type == 'TRUE':
         t[0] = Literal(t[1], TIPO_DATO.BOOL, t.lineno(1), find_column(input, t.slice[1]))
     elif t.slice[1].type == 'FALSE':
