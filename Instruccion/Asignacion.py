@@ -8,6 +8,7 @@ class Asignacion(Instruccion):
         self.valor = valor
 
     def ejecutar(self, entorno):
+        #print(f'asig_ejec: {self.id}')
         val = self.valor.ejecutar(entorno)
-        # print(f'Decla: {val.tipo}')
+        #print(f'Asig: {self.valor}')
         entorno.asignar_var(self.id, val.valor, val.tipo)

@@ -23,7 +23,7 @@ class Declaracion_Tipo(Instruccion):
 
     def ejecutar(self, entorno):
         val = self.valor.ejecutar(entorno)
-        print(f'dec_tipo_ejec{val}')
+        #print(f'dec_tipo_ejec{val}')
         if val.tipo == self.tipo:
             entorno.guardar_var_tipo(self.id, val.valor, self.tipo, self.mutable)
         else:

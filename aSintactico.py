@@ -4,10 +4,15 @@ from Expresion.Logica import Logica
 from Expresion.Relacional import Relacional
 from Instruccion.Asignacion import Asignacion
 from Instruccion.Declaracion import Declaracion, Declaracion_Tipo
+from Instruccion.Sentencia import Sentencia
 from Nativas.Exponente import Exponente
 from Simbolo.Entorno import Entorno
 from aLexico import tokens, analizador, find_column
 from Instruccion.Imprimir import Print
+from Instruccion.If import If
+from Instruccion.While import While
+from Instruccion.Break import Break
+from Instruccion.Continue import Continue
 from Expresion.Literal import Literal
 from Simbolo.Tipo import *
 from Expresion.Aritmetica import Aritmetica
@@ -42,8 +47,13 @@ def p_instruccion(t):
     '''instruccion : declaracion
                   | declaracion_con_tipo
                   | asignacion
-                  | print_inst'''
+                  | ifst
+                  | whilest
+                  | print_inst
+                  | breakinst
+                  | continueinst'''
     t[0] = t[1]
+
 
 def p_declaracion(t):
     '''declaracion : LET ID IGUAL expresion PTOCOMA
@@ -53,6 +63,7 @@ def p_declaracion(t):
     else:
         t[0] = Declaracion(t[2], t[4], False, t.lineno(3), find_column(input, t.slice[3]))
 
+
 def p_declaracion_con_tipo(t):
     '''declaracion_con_tipo : LET ID DOSPTOS tipo_dato IGUAL expresion PTOCOMA
                             | LET MUT ID DOSPTOS tipo_dato IGUAL expresion PTOCOMA'''
@@ -60,6 +71,7 @@ def p_declaracion_con_tipo(t):
         t[0] = Declaracion_Tipo(t[3], t[7], t[5], True, t.lineno(6), find_column(input, t.slice[6]))
     else:
         t[0] = Declaracion_Tipo(t[2], t[6], t[4], False, t.lineno(5), find_column(input, t.slice[5]))
+
 
 def p_tipo_dato(t):
     '''tipo_dato : I64
@@ -84,9 +96,50 @@ def p_tipo_dato(t):
             tipo = TIPO_DATO.CHAR
     t[0] = tipo
 
+
 def p_asignacion(t):
     '''asignacion : ID IGUAL expresion PTOCOMA'''
     t[0] = Asignacion(t[1], t[3], t.lineno(1), find_column(input, t.slice[1]))
+
+
+def p_ifst(t):
+    '''ifst : IF expresion st elsest'''
+    t[0] = If(t.lineno(1), find_column(input, t.slice[1]), t[2], t[3], t[4])
+
+
+def p_elsest(t):
+    '''elsest : ELSE st
+              | ELSE ifst
+              | '''
+
+    if len(t) > 1:
+        t[0] = t[2]
+    else:
+        t[0] = None
+
+
+def p_whilest(t):
+    '''whilest : WHILE expresion st '''
+    t[0] = While(t.lineno(1), find_column(input, t.slice[1]), t[2], t[3])
+
+
+def p_breakinst(t):
+    '''breakinst : BREAK PTOCOMA'''
+    t[0] = Break(t.lineno(1), find_column(input, t.slice[1]))
+
+def p_continueinst(t):
+    '''continueinst : CONTINUE PTOCOMA'''
+    t[0] = Continue(t.lineno(1), find_column(input, t.slice[1]))
+
+def p_st(t):
+    '''st : ILLAVE instrucciones DLLAVE
+          | ILLAVE DLLAVE'''
+    # print(f't[2]: {t.slice[2].type}')
+    if t.slice[2].type == 'instrucciones':
+        t[0] = Sentencia(t.lineno(1), find_column(input, t.slice[1]), t[2])
+    else:
+        t[0] = Sentencia(t.lineno(1), find_column(input, t.slice[1]), None)
+
 
 def p_print(t):
     'print_inst : PRINTLN NOT IPAR expresion DPAR PTOCOMA'
@@ -103,7 +156,7 @@ def p_expresion_aritmetica(t):
                 | I64 DOSPTOS DOSPTOS POW IPAR expresion COMA expresion DPAR
                 | F64 DOSPTOS DOSPTOS POWF IPAR expresion COMA expresion DPAR'''
     if t[2] == '+':
-        #print(f'|--->{t[1]}')
+        # print(f'|--->{t[1]}')
         t[0] = Aritmetica(t[1], TIPO_OPERACION.SUMA, t[3], t.lineno(2), find_column(input, t.slice[2]), None)
     elif t[2] == '-':
         t[0] = Aritmetica(t[1], TIPO_OPERACION.RESTA, t[3], t.lineno(2), find_column(input, t.slice[2]), None)
@@ -129,7 +182,7 @@ def p_expresion_agrupacion(t):
     t[0] = t[2]
 
 
-def p_expresion_relacional(t) :
+def p_expresion_relacional(t):
     '''expresion : expresion MAYORQ expresion
                         | expresion MENORQ expresion
                         | expresion MYRIGUAL expresion
@@ -149,17 +202,19 @@ def p_expresion_relacional(t) :
     elif t.slice[2].type == 'DISTINTO':
         t[0] = Relacional(t[1], TIPO_RELACIONAL.DISTINTO, t[3], t.lineno(2), find_column(input, t.slice[2]))
 
+
 def p_expresion_logica(t):
     '''expresion : expresion AND expresion
                  | expresion NOT expresion
                  | NOT expresion %prec NEGA'''
-    #print(f'gtipo: {t.slice[2].type}, gvalor {t[1]}')
+    # print(f'gtipo: {t.slice[2].type}, gvalor {t[1]}')
     if t.slice[2].type == 'AND':
         t[0] = Logica(t[1], TIPO_LOGICO.AND, t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t.slice[2].type == 'NOT':
         t[0] = Logica(t[1], TIPO_LOGICO.OR, t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t.slice[1].type == 'NOT':
         t[0] = Logica(None, TIPO_LOGICO.NOT, t[2], t.lineno(1), find_column(input, t.slice[1]))
+
 
 def p_expresion_primitiva(t):
     '''expresion : NUMBER
@@ -169,9 +224,9 @@ def p_expresion_primitiva(t):
                 | CHARLIT
                 | TRUE
                 | FALSE '''
-    #print(f'gtipo: {t.slice[1].type}, gvalor {t[1]}')
+    # print(f'gtipo: {t.slice[1].type}, gvalor {t[1]}')
     if t.slice[1].type == 'NUMBER':
-        #print(f'Linea: {t.lineno(1)}, Columna: {find_column(input, t.slice[1])}')
+        # print(f'Linea: {t.lineno(1)}, Columna: {find_column(input, t.slice[1])}')
         t[0] = Literal(t[1], TIPO_DATO.INTEGER, t.lineno(1), find_column(input, t.slice[1]))
     elif t.slice[1].type == 'DECIMAL':
         t[0] = Literal(t[1], TIPO_DATO.FLOAT, t.lineno(1), find_column(input, t.slice[1]))

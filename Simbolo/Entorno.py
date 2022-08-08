@@ -42,7 +42,7 @@ class Entorno:
             if id in env.variables:
                 tmpvar = env.variables.get(id)
                 is_mut = tmpvar.mutable
-                print(f'Env_AsigVar->{tmpvar.tipo}')
+                #print(f'Env_AsigVar->{tmpvar.tipo}')
                 if is_mut:
                     env.variables.update({id: Simbolo(id, valor, tipo, is_mut)})
                     return
@@ -50,11 +50,11 @@ class Entorno:
                     print(f'Err_Ent_AsigVar: La variable "{id}" no es mutable, no se puede modificar!')
                     return
                 #print(f'{env.variables.get(id).mutable}')
-
-            else:
-                print(f'Err_Ent_Asig: La variable no existe')
+            #else:
+                #print(f'Err_Ent_Asig: La variable no existe')
             env = env.anterior
         if env is None:
+            print(f'Err_Ent_Asig: La variable no existe')
             return
             # print(f'Ent_var: {self.variables}')
 

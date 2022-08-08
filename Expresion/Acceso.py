@@ -8,6 +8,7 @@ class Acceso(Expresion):
         self.id = id
 
     def ejecutar(self, entorno):
+        #print(f'id: {self.id}')
         valor = entorno.getVar(self.id)
         #print(f'Eje_Acc: {valor}, id: {self.id}')
         if valor is not None:
