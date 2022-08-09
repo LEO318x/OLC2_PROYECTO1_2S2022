@@ -1,4 +1,5 @@
 from Abstract.Instruccion import Instruccion
+from Simbolo.Tipo import TIPO_DATO
 
 
 class Declaracion(Instruccion):
@@ -23,7 +24,7 @@ class Declaracion_Tipo(Instruccion):
 
     def ejecutar(self, entorno):
         val = self.valor.ejecutar(entorno)
-        #print(f'dec_tipo_ejec{val}')
+        #print(f'dec_tipo_ejec: {val.tipo}, -> {self.tipo}')
         if val.tipo == self.tipo:
             entorno.guardar_var_tipo(self.id, val.valor, self.tipo, self.mutable)
         else:

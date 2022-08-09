@@ -59,6 +59,14 @@ class Aritmetica(Expresion):
                     resultado = Retorno(valorIzq.valor / valorDer.valor, TIPO_DATO.FLOAT)
             elif TIPO_OPERACION.MOD == self.tipo_operacion:
                 resultado = Retorno(valorIzq.valor % valorDer.valor, TIPO_DATO.FLOAT)
+        elif TIPO_DATO.STRING == valorIzq.tipo and TIPO_DATO.RSTR == valorDer.tipo:
+                if TIPO_OPERACION.SUMA == self.tipo_operacion:
+                    resultado = Retorno(valorIzq.valor + valorDer.valor, TIPO_DATO.STRING)
+                    return resultado
+                else:
+                    print(f'Arit: Operacion no permitida')
+                    resultado = Retorno(0, TIPO_DATO.INTEGER)
+                return resultado
         else:
             print(f'Los tipos de datos no coinciden {valorIzq.tipo}!={valorDer.tipo}')
             resultado = Retorno(0, TIPO_DATO.INTEGER)

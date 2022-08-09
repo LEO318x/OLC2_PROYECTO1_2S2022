@@ -9,7 +9,7 @@ class While(Instruccion):
         self.codigo = codigo
 
     def ejecutar(self, entorno):
-        print(f'while_ejec: {self.condicion}')
+        #print(f'while_ejec: {self.condicion}')
         condicion = self.condicion.ejecutar(entorno)
 
         if condicion.tipo != TIPO_DATO.BOOL:
@@ -24,7 +24,7 @@ class While(Instruccion):
                 elif elemento.tipo == TIPO_DATO.CONTINUE:
                     continue
                 else:
-                    print(f'while_ejec_elem: {elemento.tipo}')
+                    #print(f'while_ejec_elem: {elemento.tipo}')
                     return elemento
             condicion = self.condicion.ejecutar(entorno)
             if condicion.tipo != TIPO_DATO.BOOL:

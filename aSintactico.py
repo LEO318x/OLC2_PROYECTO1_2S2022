@@ -3,9 +3,15 @@ from Expresion.Acceso import Acceso
 from Expresion.Logica import Logica
 from Expresion.Relacional import Relacional
 from Instruccion.Asignacion import Asignacion
+from Instruccion.Casteo import Casteo
 from Instruccion.Declaracion import Declaracion, Declaracion_Tipo
+from Instruccion.Loop import Loop
 from Instruccion.Sentencia import Sentencia
+from Nativas.Abs import Abs
 from Nativas.Exponente import Exponente
+from Nativas.Sqrt import Sqrt
+from Nativas.ToOwned import ToOwned
+from Nativas.ToString import ToString
 from Simbolo.Entorno import Entorno
 from aLexico import tokens, analizador, find_column
 from Instruccion.Imprimir import Print
@@ -19,10 +25,15 @@ from Expresion.Aritmetica import Aritmetica
 
 # Asociación de operadores y precedencia
 precedence = (
-    # ('left','CONCAT'),
+    ('left', 'OR'),
+    ('left', 'AND'),
+    ('right', 'NEGA'),
+    ('left', 'IGUALACION', 'DISTINTO'),
+    ('left', 'MENORQ', 'MAYORQ', 'MYRIGUAL', 'MNRIGUAL'),
     ('left', 'MAS', 'MENOS'),
     ('left', 'MUL', 'DIV', 'MOD'),
-    ('right', 'UMENOS', 'NEGA'),
+    ('left', 'IPAR', 'DPAR'),
+    ('right', 'UMENOS'),
 )
 
 
@@ -49,6 +60,7 @@ def p_instruccion(t):
                   | asignacion
                   | ifst
                   | whilest
+                  | loopst
                   | print_inst
                   | breakinst
                   | continueinst'''
@@ -122,6 +134,10 @@ def p_whilest(t):
     '''whilest : WHILE expresion st '''
     t[0] = While(t.lineno(1), find_column(input, t.slice[1]), t[2], t[3])
 
+def p_loopst(t):
+    '''loopst : LOOP st'''
+    t[0] = Loop(t.lineno(1), find_column(input, t.slice[1]), t[2])
+
 
 def p_breakinst(t):
     '''breakinst : BREAK PTOCOMA'''
@@ -154,7 +170,8 @@ def p_expresion_aritmetica(t):
                 | expresion DIV expresion
                 | expresion MOD expresion
                 | I64 DOSPTOS DOSPTOS POW IPAR expresion COMA expresion DPAR
-                | F64 DOSPTOS DOSPTOS POWF IPAR expresion COMA expresion DPAR'''
+                | F64 DOSPTOS DOSPTOS POWF IPAR expresion COMA expresion DPAR '''
+
     if t[2] == '+':
         # print(f'|--->{t[1]}')
         t[0] = Aritmetica(t[1], TIPO_OPERACION.SUMA, t[3], t.lineno(2), find_column(input, t.slice[2]), None)
@@ -205,15 +222,37 @@ def p_expresion_relacional(t):
 
 def p_expresion_logica(t):
     '''expresion : expresion AND expresion
-                 | expresion NOT expresion
+                 | expresion OR expresion
                  | NOT expresion %prec NEGA'''
     # print(f'gtipo: {t.slice[2].type}, gvalor {t[1]}')
     if t.slice[2].type == 'AND':
         t[0] = Logica(t[1], TIPO_LOGICO.AND, t[3], t.lineno(2), find_column(input, t.slice[2]))
-    elif t.slice[2].type == 'NOT':
+    elif t.slice[2].type == 'OR':
         t[0] = Logica(t[1], TIPO_LOGICO.OR, t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t.slice[1].type == 'NOT':
         t[0] = Logica(None, TIPO_LOGICO.NOT, t[2], t.lineno(1), find_column(input, t.slice[1]))
+
+
+def p_expresion_casteo_primitiva(t):
+    '''expresion : expresion AS tipo_dato '''
+    t[0] = Casteo(t.lineno(2), find_column(input, t.slice[2]), t[3], t[1])
+
+
+def p_expresion_tostring(t):
+    '''expresion : expresion PUNTO TO_STRING IPAR DPAR'''
+    t[0] = ToString(t.lineno(2), find_column(input, t.slice[2]), t[1])
+
+def p_expresion_toowned(t):
+    '''expresion : expresion PUNTO TO_OWNED IPAR DPAR'''
+    t[0] = ToOwned(t.lineno(2), find_column(input, t.slice[2]), t[1])
+
+def p_expresion_abs(t):
+    '''expresion : expresion PUNTO ABS IPAR DPAR'''
+    t[0] = Abs(t.lineno(2), find_column(input, t.slice[2]), t[1])
+
+def p_expresion_sqrt(t):
+    '''expresion : expresion PUNTO SQRT IPAR DPAR'''
+    t[0] = Sqrt(t.lineno(2), find_column(input, t.slice[2]), t[1])
 
 
 def p_expresion_primitiva(t):
@@ -224,6 +263,7 @@ def p_expresion_primitiva(t):
                 | CHARLIT
                 | TRUE
                 | FALSE '''
+
     # print(f'gtipo: {t.slice[1].type}, gvalor {t[1]}')
     if t.slice[1].type == 'NUMBER':
         # print(f'Linea: {t.lineno(1)}, Columna: {find_column(input, t.slice[1])}')
@@ -240,7 +280,6 @@ def p_expresion_primitiva(t):
         t[0] = Literal(t[1], TIPO_DATO.BOOL, t.lineno(1), find_column(input, t.slice[1]))
     elif t.slice[1].type == 'FALSE':
         t[0] = Literal(t[1], TIPO_DATO.BOOL, t.lineno(1), find_column(input, t.slice[1]))
-
 
 def p_error(t):
     print(t)

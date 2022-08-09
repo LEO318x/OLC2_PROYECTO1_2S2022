@@ -26,7 +26,7 @@ class Entorno:
 
     def guardar_var_tipo(self, id, valor, tipo, mutable):
         env = self
-        print(f'Env_var_tipo->{id, valor, tipo}')
+        #print(f'Env_var_tipo->{id, valor, tipo}')
         while env != None:
             if id in env.variables:
                 env.variables.update({id: Simbolo(id, valor, tipo, mutable)})
