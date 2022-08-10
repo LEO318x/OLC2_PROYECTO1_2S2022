@@ -21,5 +21,3 @@ class If(Instruccion):
         else:
             if self.instruccion_else:
                 return self.instruccion_else.ejecutar(entorno)
-
-        # Falta el else

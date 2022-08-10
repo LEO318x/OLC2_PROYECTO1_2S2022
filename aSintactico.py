@@ -116,6 +116,7 @@ def p_asignacion(t):
 
 def p_ifst(t):
     '''ifst : IF expresion st elsest'''
+    #print(f'g_if{t[3]}')
     t[0] = If(t.lineno(1), find_column(input, t.slice[1]), t[2], t[3], t[4])
 
 
@@ -158,10 +159,20 @@ def p_st(t):
 
 
 def p_print(t):
-    'print_inst : PRINTLN NOT IPAR expresion DPAR PTOCOMA'
+    '''print_inst : PRINTLN NOT IPAR lexpresion DPAR PTOCOMA'''
+
     instr = Print(t[4])
     t[0] = instr
 
+def p_lprint(t):
+    '''lexpresion : lexpresion COMA expresion'''
+    t[1].append(t[3])
+    t[0] = t[1]
+
+
+def p_lprinto(t):
+    '''lexpresion : expresion'''
+    t[0] = [t[1]]
 
 def p_expresion_aritmetica(t):
     '''expresion : expresion MAS expresion
@@ -280,6 +291,11 @@ def p_expresion_primitiva(t):
         t[0] = Literal(t[1], TIPO_DATO.BOOL, t.lineno(1), find_column(input, t.slice[1]))
     elif t.slice[1].type == 'FALSE':
         t[0] = Literal(t[1], TIPO_DATO.BOOL, t.lineno(1), find_column(input, t.slice[1]))
+
+
+def p_empty(t):
+    'empty :'
+    pass
 
 def p_error(t):
     print(t)

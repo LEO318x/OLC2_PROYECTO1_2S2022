@@ -11,10 +11,11 @@ class TIPO_DATO(Enum):
     NULL = 7
     ARRAY = 8
     VECT = 9
-    BREAK = 10
-    CONTINUE = 11
-    RETURN = 12
-    RSTR = 13
+    STRUCT = 10
+    BREAK = 11
+    CONTINUE = 12
+    RETURN = 13
+    RSTR = 14
 
 class TIPO_OPERACION(Enum):
     SUMA = 1

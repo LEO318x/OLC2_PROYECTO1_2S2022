@@ -15,5 +15,5 @@ class Acceso(Expresion):
             #print(f'Acc_Eje: {valor}')
             return Retorno(valor.valor, valor.tipo)
         else:
-            print(f'Error_Acc, la variable no existe')
+            print(f'Error_Acc, la variable "{self.id}" no existe')
             return None
