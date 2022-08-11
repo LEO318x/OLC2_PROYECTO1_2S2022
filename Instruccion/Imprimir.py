@@ -8,12 +8,28 @@ class Print(Instruccion):
         self.lexpresion = lexpression
 
     def ejecutar(self, entorno):
-        if len(self.lexpresion) > 1:
-            for expresion in self.lexpresion:
-                if valor.tipo == TIPO_DATO.RSTR:
+        tmpls = self.lexpresion.copy()
+        tmplsaux = self.lexpresion.copy()
+        if len(tmpls) > 1:
+            tmpexpr = tmpls[0].ejecutar(entorno)
+            #print(f'imp_eje: {tmpexpr.valor}')
+            if "{}" in tmpexpr.valor or "{:?}" in tmpexpr.valor:
+                del tmpls[0]
+                tmpprint = tmpexpr.valor
+                lstemp = []
+                for expresion in tmpls:
                     valor = expresion.ejecutar(entorno)
-                    print(f"{valor.valor}")
+                    lstemp.append(valor.valor)
+                    #print(f"{valor.valor}")
+                try:
+                    tmpls = tmplsaux
+                    tmpprint = tmpexpr.valor.format(*lstemp)
+                    print(f'{tmpprint}')
+                except:
+                    print(f'Error_Print: ¿¿¿Misma cantidad de expresiones y', "{}{:?} o tipo dato no coincide con {}{:?} ???")
+            else:
+                print(f'imp_error: Falta', "{} {:?}")
         else:
-            for expresion in self.lexpresion:
+            for expresion in tmpls:
                 valor = expresion.ejecutar(entorno)
                 print(f"{valor.valor}")

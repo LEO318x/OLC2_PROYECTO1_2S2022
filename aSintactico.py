@@ -5,6 +5,7 @@ from Expresion.Relacional import Relacional
 from Instruccion.Asignacion import Asignacion
 from Instruccion.Casteo import Casteo
 from Instruccion.Declaracion import Declaracion, Declaracion_Tipo
+from Instruccion.ForIn import ForIn
 from Instruccion.Loop import Loop
 from Instruccion.Sentencia import Sentencia
 from Nativas.Abs import Abs
@@ -61,6 +62,7 @@ def p_instruccion(t):
                   | ifst
                   | whilest
                   | loopst
+                  | forinst
                   | print_inst
                   | breakinst
                   | continueinst'''
@@ -139,6 +141,12 @@ def p_loopst(t):
     '''loopst : LOOP st'''
     t[0] = Loop(t.lineno(1), find_column(input, t.slice[1]), t[2])
 
+def p_forinst(t):
+    '''forinst : FOR ID IN expresion PUNTO PUNTO expresion st'''
+    t[0] = ForIn(t.lineno(1), find_column(input, t.slice[1]), t[2], t[4], t[7], t[8])
+
+def p_forinstexpr(t):
+    '''forinst : FOR ID IN expresion st'''
 
 def p_breakinst(t):
     '''breakinst : BREAK PTOCOMA'''

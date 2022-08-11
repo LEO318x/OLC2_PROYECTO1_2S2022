@@ -79,6 +79,8 @@ reservadas = {
     'else': 'ELSE',
     'while': 'WHILE',
     'loop': 'LOOP',
+    'for' : 'FOR',
+    'in' : 'IN',
     'match': 'MATCH',
     'pow': 'POW',
     'powf': 'POWF',
