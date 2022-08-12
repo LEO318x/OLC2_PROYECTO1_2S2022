@@ -4,7 +4,8 @@ from Simbolo.Tipo import TIPO_DATO
 
 class Print(Instruccion):
 
-    def __init__(self, lexpression):
+    def __init__(self, fila, columna, lexpression):
+        super().__init__(fila, columna)
         self.lexpresion = lexpression
 
     def ejecutar(self, entorno):

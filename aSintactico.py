@@ -63,6 +63,7 @@ def p_instruccion(t):
                   | whilest
                   | loopst
                   | forinst
+                  | matchst
                   | print_inst
                   | breakinst
                   | continueinst'''
@@ -148,6 +149,8 @@ def p_forinst(t):
 def p_forinstexpr(t):
     '''forinst : FOR ID IN expresion st'''
 
+
+
 def p_breakinst(t):
     '''breakinst : BREAK PTOCOMA'''
     t[0] = Break(t.lineno(1), find_column(input, t.slice[1]))
@@ -169,7 +172,7 @@ def p_st(t):
 def p_print(t):
     '''print_inst : PRINTLN NOT IPAR lexpresion DPAR PTOCOMA'''
 
-    instr = Print(t[4])
+    instr = Print(t.lineno(1), find_column(input, t.slice[1]), t[4])
     t[0] = instr
 
 def p_lprint(t):
