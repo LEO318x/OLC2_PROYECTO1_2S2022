@@ -6,7 +6,10 @@ from Instruccion.Asignacion import Asignacion
 from Instruccion.Casteo import Casteo
 from Instruccion.Declaracion import Declaracion, Declaracion_Tipo
 from Instruccion.ForIn import ForIn
+from Instruccion.Funcion import Funcion
+from Instruccion.Llamar import Llamar
 from Instruccion.Loop import Loop
+from Instruccion.Match import Match
 from Instruccion.Sentencia import Sentencia
 from Nativas.Abs import Abs
 from Nativas.Exponente import Exponente
@@ -14,6 +17,7 @@ from Nativas.Sqrt import Sqrt
 from Nativas.ToOwned import ToOwned
 from Nativas.ToString import ToString
 from Simbolo.Entorno import Entorno
+from Simbolo.Simbolo import Simbolo
 from aLexico import tokens, analizador, find_column
 from Instruccion.Imprimir import Print
 from Instruccion.If import If
@@ -63,10 +67,12 @@ def p_instruccion(t):
                   | whilest
                   | loopst
                   | forinst
-                  | matchst
+                  | fnst
+                  | llamarfn PTOCOMA
                   | print_inst
                   | breakinst
-                  | continueinst'''
+                  | continueinst
+                  '''
     t[0] = t[1]
 
 
@@ -119,7 +125,7 @@ def p_asignacion(t):
 
 def p_ifst(t):
     '''ifst : IF expresion st elsest'''
-    #print(f'g_if{t[3]}')
+    # print(f'g_if{t[3]}')
     t[0] = If(t.lineno(1), find_column(input, t.slice[1]), t[2], t[3], t[4])
 
 
@@ -138,26 +144,70 @@ def p_whilest(t):
     '''whilest : WHILE expresion st '''
     t[0] = While(t.lineno(1), find_column(input, t.slice[1]), t[2], t[3])
 
+
 def p_loopst(t):
     '''loopst : LOOP st'''
     t[0] = Loop(t.lineno(1), find_column(input, t.slice[1]), t[2])
+
 
 def p_forinst(t):
     '''forinst : FOR ID IN expresion PUNTO PUNTO expresion st'''
     t[0] = ForIn(t.lineno(1), find_column(input, t.slice[1]), t[2], t[4], t[7], t[8])
 
+
 def p_forinstexpr(t):
     '''forinst : FOR ID IN expresion st'''
-
 
 
 def p_breakinst(t):
     '''breakinst : BREAK PTOCOMA'''
     t[0] = Break(t.lineno(1), find_column(input, t.slice[1]))
 
+
 def p_continueinst(t):
     '''continueinst : CONTINUE PTOCOMA'''
     t[0] = Continue(t.lineno(1), find_column(input, t.slice[1]))
+
+
+def p_fnst(t):
+    '''fnst : FN ID IPAR lparams DPAR st'''
+    t[0] = Funcion(t.lineno(1), find_column(input, t.slice[1]), t[2], t[6], t[4])
+
+
+def p_fnsto(t):
+    '''fnst : FN ID IPAR DPAR st'''
+    t[0] = Funcion(t.lineno(1), find_column(input, t.slice[1]), t[2], t[5], None)
+
+
+def p_lparams(t):
+    '''lparams : lparams COMA ID DOSPTOS tipo_dato'''
+    #t[1].append(t[3] + ":" + str(t[5]))
+    t[1].append(Simbolo(t[3], None, t[5], False))
+    t[0] = t[1]
+
+
+def p_lparamso(t):
+    '''lparams : ID DOSPTOS tipo_dato'''
+    #t[0] = [t[1] + ":" + str(t[3])]
+    t[0] = [Simbolo(t[1], None, t[3], False)]
+
+def p_llamarfn(t):
+    '''llamarfn : ID IPAR llparams DPAR'''
+    t[0] = Llamar(t.lineno(1), find_column(input, t.slice[1]), t[1], t[3])
+
+
+def p_llamarfno(t):
+    '''llamarfn : ID IPAR DPAR'''
+    t[0] = Llamar(t.lineno(1), find_column(input, t.slice[1]), t[1], None)
+
+def p_llparams(t):
+    '''llparams : llparams COMA expresion'''
+    t[1].append(t[3])
+    t[0] = t[1]
+
+def p_llparamso(t):
+    '''llparams : expresion '''
+    t[0] = [t[1]]
 
 def p_st(t):
     '''st : ILLAVE instrucciones DLLAVE
@@ -175,6 +225,7 @@ def p_print(t):
     instr = Print(t.lineno(1), find_column(input, t.slice[1]), t[4])
     t[0] = instr
 
+
 def p_lprint(t):
     '''lexpresion : lexpresion COMA expresion'''
     t[1].append(t[3])
@@ -184,6 +235,7 @@ def p_lprint(t):
 def p_lprinto(t):
     '''lexpresion : expresion'''
     t[0] = [t[1]]
+
 
 def p_expresion_aritmetica(t):
     '''expresion : expresion MAS expresion
@@ -264,13 +316,16 @@ def p_expresion_tostring(t):
     '''expresion : expresion PUNTO TO_STRING IPAR DPAR'''
     t[0] = ToString(t.lineno(2), find_column(input, t.slice[2]), t[1])
 
+
 def p_expresion_toowned(t):
     '''expresion : expresion PUNTO TO_OWNED IPAR DPAR'''
     t[0] = ToOwned(t.lineno(2), find_column(input, t.slice[2]), t[1])
 
+
 def p_expresion_abs(t):
     '''expresion : expresion PUNTO ABS IPAR DPAR'''
     t[0] = Abs(t.lineno(2), find_column(input, t.slice[2]), t[1])
+
 
 def p_expresion_sqrt(t):
     '''expresion : expresion PUNTO SQRT IPAR DPAR'''
@@ -307,6 +362,7 @@ def p_expresion_primitiva(t):
 def p_empty(t):
     'empty :'
     pass
+
 
 def p_error(t):
     print(t)

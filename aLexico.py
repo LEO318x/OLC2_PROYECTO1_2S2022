@@ -79,15 +79,15 @@ reservadas = {
     'else': 'ELSE',
     'while': 'WHILE',
     'loop': 'LOOP',
-    'for' : 'FOR',
-    'in' : 'IN',
+    'for': 'FOR',
+    'in': 'IN',
     'match': 'MATCH',
     'pow': 'POW',
     'powf': 'POWF',
     'Vec': 'VEC'
 }
 
-tokens = tokens+list(reservadas.values())
+tokens = tokens + list(reservadas.values())
 
 t_RSTR = '&str'
 t_GUIONFLECHA = r'\->'
@@ -120,6 +120,7 @@ t_DISTINTO = r'!='
 t_OR = r'\|\|'
 t_AND = r'&&'
 
+
 def t_DECIMAL(t):
     r'\d+\.\d+'
     try:
@@ -128,6 +129,7 @@ def t_DECIMAL(t):
         print("Float value too large %d", t.value)
         t.value = 0
     return t
+
 
 def t_NUMBER(t):
     r'\d+'
@@ -138,48 +140,57 @@ def t_NUMBER(t):
         t.value = 0
     return t
 
+
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
     if t.value in reservadas:
         t.value = t.value
         t.type = reservadas.get(t.value, 'ID')
-        #print(f'tvalue: {t.value}, ttype: {t.type}')
+        # print(f'tvalue: {t.value}, ttype: {t.type}')
     return t
+
 
 def t_COMENT(t):
     r'//.*\n'
     t.lexer.lineno += 1
 
+
 t_ignore = ' \t'
+
 
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += t.value.count("\n")
 
+
 def t_STRLIT(t):
     r'\".*?\"'
-    t.value = t.value[1:-1] # remuevo las comillas dobles
+    t.value = t.value[1:-1]  # remuevo las comillas dobles
     return t
+
 
 def t_CHARLIT(t):
     r'\'.*?\''
-    t.value = t.value[1:-1] # remuevo las comillas simples
+    t.value = t.value[1:-1]  # remuevo las comillas simples
     return t
+
 
 def find_column(inp, tk):
     line_start = inp.rfind('\n', 0, tk.lexpos) + 1
     return (tk.lexpos - line_start) + 1
 
+
 def t_error(t):
     print("caracter ilegal '%s'" % t.value[0])
     t.lexer.skip(1)
 
+
 # Asociación de operadores y precedencia
 precedence = (
-    ('left','MAS','MENOS'),
-    ('left','MUL','DIV'),
-    ('right','UMENOS'),
-    )
+    ('left', 'MAS', 'MENOS'),
+    ('left', 'MUL', 'DIV'),
+    ('right', 'UMENOS'),
+)
 
 analizador = lex.lex()
 
@@ -190,5 +201,5 @@ if __name__ == '__main__':
 
     while True:
         tok = analizador.token()
-        if not tok : break
+        if not tok: break
         print(tok)

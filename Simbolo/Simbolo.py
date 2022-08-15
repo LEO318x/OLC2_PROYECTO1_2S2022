@@ -1,4 +1,3 @@
-from Abstract.Retorno import Retorno
 
 
 class Simbolo:
