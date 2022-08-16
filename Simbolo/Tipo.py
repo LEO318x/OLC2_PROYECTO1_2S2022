@@ -16,6 +16,7 @@ class TIPO_DATO(Enum):
     CONTINUE = 12
     RETURN = 13
     RSTR = 14
+    ERROR = 15
 
 class TIPO_OPERACION(Enum):
     SUMA = 1

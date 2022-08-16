@@ -8,10 +8,13 @@ from Instruccion.Declaracion import Declaracion, Declaracion_Tipo
 from Instruccion.ForIn import ForIn
 from Instruccion.Funcion import Funcion
 from Instruccion.Llamar import Llamar
+from Instruccion.LlamarExpr import LlamarExpr
 from Instruccion.Loop import Loop
 from Instruccion.Match import Match
+from Instruccion.Return import Return
 from Instruccion.Sentencia import Sentencia
 from Nativas.Abs import Abs
+from Nativas.Clone import Clone
 from Nativas.Exponente import Exponente
 from Nativas.Sqrt import Sqrt
 from Nativas.ToOwned import ToOwned
@@ -68,10 +71,12 @@ def p_instruccion(t):
                   | loopst
                   | forinst
                   | fnst
+                  | fnwretst
                   | llamarfn PTOCOMA
                   | print_inst
-                  | breakinst
-                  | continueinst
+                  | breakinst PTOCOMA
+                  | continueinst PTOCOMA
+                  | returninst PTOCOMA
                   '''
     t[0] = t[1]
 
@@ -160,13 +165,17 @@ def p_forinstexpr(t):
 
 
 def p_breakinst(t):
-    '''breakinst : BREAK PTOCOMA'''
+    '''breakinst : BREAK'''
     t[0] = Break(t.lineno(1), find_column(input, t.slice[1]))
 
 
 def p_continueinst(t):
-    '''continueinst : CONTINUE PTOCOMA'''
+    '''continueinst : CONTINUE'''
     t[0] = Continue(t.lineno(1), find_column(input, t.slice[1]))
+
+def p_returninst(t):
+    '''returninst : RETURN expresion'''
+    t[0] = Return(t.lineno(1), find_column(input, t.slice[1]), t[2])
 
 
 def p_fnst(t):
@@ -178,6 +187,15 @@ def p_fnsto(t):
     '''fnst : FN ID IPAR DPAR st'''
     t[0] = Funcion(t.lineno(1), find_column(input, t.slice[1]), t[2], t[5], None)
 
+
+def p_fnwithreturn(t):
+    '''fnwretst : FN ID IPAR lparams DPAR GUIONFLECHA tipo_dato st'''
+    t[0] = Funcion(t.lineno(1), find_column(input, t.slice[1]), t[2], t[8], t[4], t[7])
+
+
+def p_fnwithreturno(t):
+    '''fnwretst : FN ID IPAR DPAR GUIONFLECHA tipo_dato st'''
+    t[0] = Funcion(t.lineno(1), find_column(input, t.slice[1]), t[2], t[7], None, t[6])
 
 def p_lparams(t):
     '''lparams : lparams COMA ID DOSPTOS tipo_dato'''
@@ -312,6 +330,16 @@ def p_expresion_casteo_primitiva(t):
     t[0] = Casteo(t.lineno(2), find_column(input, t.slice[2]), t[3], t[1])
 
 
+def p_llamarfncomoexpr(t):
+    '''expresion : ID IPAR llparams DPAR'''
+    t[0] = LlamarExpr(t.lineno(1), find_column(input, t.slice[1]), t[1], t[3])
+
+
+def p_llamarfncomoexpro(t):
+    '''expresion : ID IPAR DPAR'''
+    t[0] = LlamarExpr(t.lineno(1), find_column(input, t.slice[1]), t[1], [])
+
+
 def p_expresion_tostring(t):
     '''expresion : expresion PUNTO TO_STRING IPAR DPAR'''
     t[0] = ToString(t.lineno(2), find_column(input, t.slice[2]), t[1])
@@ -320,6 +348,11 @@ def p_expresion_tostring(t):
 def p_expresion_toowned(t):
     '''expresion : expresion PUNTO TO_OWNED IPAR DPAR'''
     t[0] = ToOwned(t.lineno(2), find_column(input, t.slice[2]), t[1])
+
+
+def p_expresion_clone(t):
+    '''expresion : expresion PUNTO CLONE IPAR DPAR'''
+    t[0] = Clone(t.lineno(2), find_column(input, t.slice[2]), t[1])
 
 
 def p_expresion_abs(t):
