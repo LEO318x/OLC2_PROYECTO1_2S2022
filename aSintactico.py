@@ -1,6 +1,7 @@
 import ply.yacc as yacc
 from Expresion.Acceso import Acceso
 from Expresion.Logica import Logica
+from Expresion.NewStruct import NewStruct
 from Expresion.Relacional import Relacional
 from Instruccion.Asignacion import Asignacion
 from Instruccion.Casteo import Casteo
@@ -77,6 +78,7 @@ def p_instruccion(t):
                   | breakinst PTOCOMA
                   | continueinst PTOCOMA
                   | returninst PTOCOMA
+                  | structdec
                   '''
     t[0] = t[1]
 
@@ -105,7 +107,8 @@ def p_tipo_dato(t):
                  | STRING
                  | RSTR
                  | CHAR
-                 | BOOL'''
+                 | BOOL
+                 | ID'''
     tipo = ""
     match t[1]:
         case 'i64':
@@ -120,6 +123,8 @@ def p_tipo_dato(t):
             tipo = TIPO_DATO.RSTR
         case 'char':
             tipo = TIPO_DATO.CHAR
+        case _:
+            tipo = TIPO_DATO.TYPE
     t[0] = tipo
 
 
@@ -173,6 +178,7 @@ def p_continueinst(t):
     '''continueinst : CONTINUE'''
     t[0] = Continue(t.lineno(1), find_column(input, t.slice[1]))
 
+
 def p_returninst(t):
     '''returninst : RETURN expresion'''
     t[0] = Return(t.lineno(1), find_column(input, t.slice[1]), t[2])
@@ -197,17 +203,19 @@ def p_fnwithreturno(t):
     '''fnwretst : FN ID IPAR DPAR GUIONFLECHA tipo_dato st'''
     t[0] = Funcion(t.lineno(1), find_column(input, t.slice[1]), t[2], t[7], None, t[6])
 
+
 def p_lparams(t):
     '''lparams : lparams COMA ID DOSPTOS tipo_dato'''
-    #t[1].append(t[3] + ":" + str(t[5]))
+    # t[1].append(t[3] + ":" + str(t[5]))
     t[1].append(Simbolo(t[3], None, t[5], False))
     t[0] = t[1]
 
 
 def p_lparamso(t):
     '''lparams : ID DOSPTOS tipo_dato'''
-    #t[0] = [t[1] + ":" + str(t[3])]
+    # t[0] = [t[1] + ":" + str(t[3])]
     t[0] = [Simbolo(t[1], None, t[3], False)]
+
 
 def p_llamarfn(t):
     '''llamarfn : ID IPAR llparams DPAR'''
@@ -216,16 +224,19 @@ def p_llamarfn(t):
 
 def p_llamarfno(t):
     '''llamarfn : ID IPAR DPAR'''
-    t[0] = Llamar(t.lineno(1), find_column(input, t.slice[1]), t[1], None)
+    t[0] = Llamar(t.lineno(1), find_column(input, t.slice[1]), t[1], [])
+
 
 def p_llparams(t):
     '''llparams : llparams COMA expresion'''
     t[1].append(t[3])
     t[0] = t[1]
 
+
 def p_llparamso(t):
     '''llparams : expresion '''
     t[0] = [t[1]]
+
 
 def p_st(t):
     '''st : ILLAVE instrucciones DLLAVE
@@ -235,6 +246,27 @@ def p_st(t):
         t[0] = Sentencia(t.lineno(1), find_column(input, t.slice[1]), t[2])
     else:
         t[0] = Sentencia(t.lineno(1), find_column(input, t.slice[1]), None)
+
+
+def p_structdec(t):
+    '''structdec : STRUCT ID ILLAVE strattrs DLLAVE'''
+    t[0] = NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[2], t[4])
+
+
+def p_strattrs(t):
+    '''strattrs : strattrs COMA strattr'''
+    t[1].append(t[3])
+    t[0] = t[1]
+
+
+def p_strattro(t):
+    '''strattrs : strattr'''
+    t[0] = [t[1]]
+
+
+def p_strattr(t):
+    '''strattr : ID DOSPTOS tipo_dato'''
+    t[0] = {t[1]: t[3]}
 
 
 def p_print(t):

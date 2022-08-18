@@ -5,9 +5,8 @@ from Simbolo.Simbolo import Simbolo
 class Entorno:
     def __init__(self, anterior=None):
         self.variables = {}
-        '''self.variables = {"a": Simbolo('a', 5, TIPO_DATO.INTEGER, False),
-                          "b": Simbolo('b', 10, TIPO_DATO.INTEGER, False)}'''
         self.funciones = dict()
+        self.estructuras = dict()
         self.anterior = anterior
 
     def guardar(self, id, valor, tipo, mutable):
@@ -70,6 +69,9 @@ class Entorno:
     def guardarFuncion(self, id, funcion):
         #print(f'ent_guardFuncion {id}, funcion: {funcion}')
         self.funciones.update({id: funcion})
+
+    def guardarEstructura(self, id, struct):
+        self.estructuras.update({id: struct})
 
     def getFuncion(self, id):
         env = self

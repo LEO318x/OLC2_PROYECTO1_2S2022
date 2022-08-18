@@ -15,13 +15,13 @@ class LlamarExpr(Instruccion):
         func = entorno.getFuncion(self.id)
         if func != None:
             nuevoEntorno = Entorno(entorno.getGlobal())
-
+            tiporetorno = func.tipo_retorno
             for i in range(len(self.parametros)):
                 # print(f'{i}')
                 valor = self.parametros[i].ejecutar(entorno)
                 funcparvalor = func.parametros[i].id
                 funcpartipo = func.parametros[i].tipo
-                tiporetorno = func.tipo_retorno
+
                 #print(f'llamarexpr_ejec: {valor.tipo}, {funcpartipo}, retorno: {tiporetorno}')
                 if valor.tipo == funcpartipo:
                     nuevoEntorno.guardar_var_tipo(funcparvalor, valor.valor, funcpartipo, False)
@@ -30,6 +30,7 @@ class LlamarExpr(Instruccion):
                     return Retorno(-1, TIPO_DATO.ERROR)
                 # print(f'llamar_val: {funcparvalor}, {funcpartipo}, {valor.valor}')
             valor = func.sentencia.ejecutar(nuevoEntorno)
+            #print(f'llamar_expr_ejec: {valor.valor.tipo}, {tiporetorno}')
             valor_tiporetorno = valor.valor.tipo
             #print(f'verificar_retorno: {valor.tipo}')
             if valor_tiporetorno == tiporetorno:
