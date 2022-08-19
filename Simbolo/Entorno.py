@@ -70,8 +70,6 @@ class Entorno:
         #print(f'ent_guardFuncion {id}, funcion: {funcion}')
         self.funciones.update({id: funcion})
 
-    def guardarEstructura(self, id, struct):
-        self.estructuras.update({id: struct})
 
     def getFuncion(self, id):
         env = self
@@ -80,6 +78,21 @@ class Entorno:
                 return env.funciones.get(id)
             env = env.anterior
         return None
+
+    def guardarEstructura(self, id, struct):
+        env = self
+        if id in env.estructuras:
+            print(f'Struct_Env_Error: Ya se encuentra una estructura con el mismo nombre')
+        else:
+            self.estructuras.update({id: struct})
+
+    def getDefEstructura(self, id):
+        env = self
+        if id in env.estructuras:
+            return self.estructuras.get(id)
+        else:
+            print(f'Struct_Env_Error: No se puede crear estructura que no esta definida')
+
 
     def getGlobal(self):
         env = self

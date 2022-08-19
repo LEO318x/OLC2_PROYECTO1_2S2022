@@ -1,9 +1,12 @@
 import ply.yacc as yacc
+from Abstract.Retorno import Retorno
 from Expresion.Acceso import Acceso
+from Expresion.AccesoId import AccesoID
 from Expresion.Logica import Logica
-from Expresion.NewStruct import NewStruct
+from Expresion.DefStruct import DefStruct
 from Expresion.Relacional import Relacional
 from Instruccion.Asignacion import Asignacion
+from Instruccion.AsignacionStruct import AsignacionStruct
 from Instruccion.Casteo import Casteo
 from Instruccion.Declaracion import Declaracion, Declaracion_Tipo
 from Instruccion.ForIn import ForIn
@@ -12,6 +15,7 @@ from Instruccion.Llamar import Llamar
 from Instruccion.LlamarExpr import LlamarExpr
 from Instruccion.Loop import Loop
 from Instruccion.Match import Match
+from Instruccion.NewStruct import NewStruct
 from Instruccion.Return import Return
 from Instruccion.Sentencia import Sentencia
 from Nativas.Abs import Abs
@@ -67,6 +71,7 @@ def p_instruccion(t):
     '''instruccion : declaracion
                   | declaracion_con_tipo
                   | asignacion
+                  | structasig
                   | ifst
                   | whilest
                   | loopst
@@ -78,7 +83,7 @@ def p_instruccion(t):
                   | breakinst PTOCOMA
                   | continueinst PTOCOMA
                   | returninst PTOCOMA
-                  | structdec
+                  | structdef
                   '''
     t[0] = t[1]
 
@@ -100,6 +105,19 @@ def p_declaracion_con_tipo(t):
     else:
         t[0] = Declaracion_Tipo(t[2], t[6], t[4], False, t.lineno(5), find_column(input, t.slice[5]))
 
+
+def p_structasig(t):
+    '''structasig : lsacceso IGUAL expresion PTOCOMA'''
+    t[0] = AsignacionStruct(t.lineno(2), find_column(input, t.slice[2]), t[1], t[3])
+
+def p_lstasig(t):
+    '''lsacceso : lsacceso PUNTO ID '''
+    t[1].append(t[3])
+    t[0] = t[1]
+
+def p_lsasigo(t):
+    '''lsacceso : ID PUNTO ID'''
+    t[0] = [t[1], t[3]]
 
 def p_tipo_dato(t):
     '''tipo_dato : I64
@@ -124,6 +142,8 @@ def p_tipo_dato(t):
         case 'char':
             tipo = TIPO_DATO.CHAR
         case _:
+            print(f'gtipodato:{type(t[1])}')
+            print(f'gtipodato:{t[1]}')
             tipo = TIPO_DATO.TYPE
     t[0] = tipo
 
@@ -248,9 +268,9 @@ def p_st(t):
         t[0] = Sentencia(t.lineno(1), find_column(input, t.slice[1]), None)
 
 
-def p_structdec(t):
-    '''structdec : STRUCT ID ILLAVE strattrs DLLAVE'''
-    t[0] = NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[2], t[4])
+def p_structdef(t):
+    '''structdef : STRUCT ID ILLAVE strattrs DLLAVE'''
+    t[0] = DefStruct(t.lineno(1), find_column(input, t.slice[1]), t[2], t[4])
 
 
 def p_strattrs(t):
@@ -266,7 +286,8 @@ def p_strattro(t):
 
 def p_strattr(t):
     '''strattr : ID DOSPTOS tipo_dato'''
-    t[0] = {t[1]: t[3]}
+    print(f'gstr: {t[3]}')
+    t[0] = {t[1]: Retorno('', t[3])}
 
 
 def p_print(t):
@@ -370,6 +391,34 @@ def p_llamarfncomoexpr(t):
 def p_llamarfncomoexpro(t):
     '''expresion : ID IPAR DPAR'''
     t[0] = LlamarExpr(t.lineno(1), find_column(input, t.slice[1]), t[1], [])
+
+def p_structexpre(t):
+    '''expresion : ID ILLAVE strattrexpre DLLAVE'''
+    t[0] = NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[1], t[3])
+
+
+def p_strattrexpre(t):
+    '''strattrexpre : strattrexpre COMA strattrexpr '''
+    t[1].append(t[3])
+    t[0] = t[1]
+
+
+def p_strattrexpr(t):
+    '''strattrexpre : strattrexpr'''
+    t[0] = [t[1]]
+
+def p_strattrexpro(t):
+    '''strattrexpr : ID DOSPTOS expresion'''
+    t[0] = {t[1]: t[3]}
+
+
+def p_structcamp(t):
+    '''expresion : expresion PUNTO ID'''
+    t[0] = AccesoID(t.lineno(2), find_column(input, t.slice[2]), t[1], t[3])
+
+
+def p_structasigvalor(t):
+    '''structasigvalor : '''
 
 
 def p_expresion_tostring(t):

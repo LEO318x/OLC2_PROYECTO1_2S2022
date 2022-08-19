@@ -5,7 +5,7 @@ from Simbolo.Struct import Struct
 from Simbolo.Tipo import TIPO_DATO
 
 
-class NewStruct(Expresion):
+class DefStruct(Expresion):
     def __init__(self, fila, columna, nombre, atributos):
         super().__init__(fila, columna)
         self.nombre = nombre
