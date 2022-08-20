@@ -12,43 +12,20 @@ class AsignacionStruct(Instruccion):
         self.expresion = expresion
 
     def ejecutar(self, entorno):
-        print(f'ids{self.ids}')
+        #print(f'ids{self.ids}')
         valor = self.expresion.ejecutar(entorno)
         simbolo = entorno.getVar(self.ids[0])
         if simbolo.mutable:
-            #print(f'{simbolo.valor}')
-            #while True:
-                for clave, valor in simbolo.valor.items():
-                    print(f'clave {clave}, valor.v {valor.tipo}')
-                    if valor.tipo == TIPO_DATO.STRUCT:
-                        simbolo = valor
+            for i in range(1, len(self.ids) - 1):
+                if simbolo.tipo == TIPO_DATO.STRUCT:
+                    simbolo = simbolo.valor.get(self.ids[i])
+                #print(f'asigstruct: simbv: {simbolo.valor} simb: {simbolo.tipo} vvalor: {valor.valor} vtipo: {valor.tipo}')
 
-            # print(f'simb: {valor}, {valor.valor}, {valor.tipo}')
-            # self.ids.pop(0)
-            # obj = simbolo.valor.get(self.ids.pop(0))
-            # while True:
-            #     print(f'ids{self.ids}')
-            #     if obj.tipo == TIPO_DATO.STRUCT:
-            #         print(f'obj: {obj.valor}, objt: {obj.tipo}')
-            #             if len(self.ids) == 1:
-            #
-            #         break
-            #     else:
-            #         break
-            #
-            # # for i in range(1, len(self.ids)):
-            # #     #while True:
-            # #     print(f'id: {self.ids[i]}')
-            # #     obj = simbolo.valor.get(self.ids[i])
-            # #     print(f'obj: {obj}')
-            #
-            # #     obj = simbolo.valor.get(self.ids[i])
-            # #     if obj.tipo == TIPO_DATO.STRUCT:
-            # #         tmp = simbolo.valor.get(self.ids[i])
-            # #         value = self.expresion.ejecutar(entorno)
-            # #         tmp.valor.update({self.ids[i]: value})
-            # #         print(f'tmp: {tmp.valor}')
-
+            ultimo = self.ids[len(self.ids)-1]
+            if ultimo in simbolo.valor:
+                simbolo.valor.update({ultimo: valor})
+            else:
+                print(f'Error_AsigStruct: El campo no existe en el struct, no se puede editar')
         else:
             print(f'Error_AsigStruct: La estructura no es mutable')
         pass
