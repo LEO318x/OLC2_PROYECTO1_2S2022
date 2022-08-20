@@ -16,5 +16,6 @@ class DefStruct(Expresion):
         newStruct = Struct()
         for atributo in self.atributos:
             newStruct.setAtributo(atributo)
-        entorno.guardarEstructura(self.nombre, newStruct)
+        env = entorno.getGlobal()
+        env.guardarEstructura(self.nombre, newStruct)
         #print(f"Struct: {newStruct.atributos}")

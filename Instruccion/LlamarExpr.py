@@ -36,5 +36,5 @@ class LlamarExpr(Instruccion):
             if valor_tiporetorno == tiporetorno:
                 return valor.valor
             else:
-                print(f'El valor de retorno no coincide con el definido en la función')
+                print(f'El valor de retorno no coincide con el definido en la función, {valor_tiporetorno} != {tiporetorno}')
                 return Retorno(-1, TIPO_DATO.ERROR)

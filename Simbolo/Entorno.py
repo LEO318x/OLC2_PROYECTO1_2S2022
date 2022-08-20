@@ -88,10 +88,11 @@ class Entorno:
 
     def getDefEstructura(self, id):
         env = self
-        if id in env.estructuras:
-            return self.estructuras.get(id)
-        else:
-            print(f'Struct_Env_Error: No se puede crear estructura que no esta definida')
+        while env != None:
+            if id in env.estructuras:
+                return env.estructuras.get(id)
+            env = env.anterior
+        return None
 
 
     def getGlobal(self):

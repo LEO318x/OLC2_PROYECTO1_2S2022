@@ -7,6 +7,7 @@ from Expresion.DefStruct import DefStruct
 from Expresion.Relacional import Relacional
 from Instruccion.Asignacion import Asignacion
 from Instruccion.AsignacionStruct import AsignacionStruct
+from Instruccion.BuscarTipo import BuscarTipo
 from Instruccion.Casteo import Casteo
 from Instruccion.Declaracion import Declaracion, Declaracion_Tipo
 from Instruccion.ForIn import ForIn
@@ -119,6 +120,7 @@ def p_lsasigo(t):
     '''lsacceso : ID PUNTO ID'''
     t[0] = [t[1], t[3]]
 
+
 def p_tipo_dato(t):
     '''tipo_dato : I64
                  | F64
@@ -127,6 +129,8 @@ def p_tipo_dato(t):
                  | CHAR
                  | BOOL
                  | ID'''
+
+    #t[0] = BuscarTipo(t.lineno(1), find_column(input, t.slice[1]), t[1])
     tipo = ""
     match t[1]:
         case 'i64':
@@ -142,11 +146,11 @@ def p_tipo_dato(t):
         case 'char':
             tipo = TIPO_DATO.CHAR
         case _:
-            print(f'gtipodato:{type(t[1])}')
-            print(f'gtipodato:{t[1]}')
-            tipo = TIPO_DATO.TYPE
+            if t.slice[1].type == "ID":
+                tipo = TIPO_DATO.STRUCT
+            else:
+                tipo = TIPO_DATO.TYPE
     t[0] = tipo
-
 
 def p_asignacion(t):
     '''asignacion : ID IGUAL expresion PTOCOMA'''
@@ -286,7 +290,7 @@ def p_strattro(t):
 
 def p_strattr(t):
     '''strattr : ID DOSPTOS tipo_dato'''
-    print(f'gstr: {t[3]}')
+    #print(f'gstr: {t[3]}')
     t[0] = {t[1]: Retorno('', t[3])}
 
 

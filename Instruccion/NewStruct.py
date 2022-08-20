@@ -15,7 +15,7 @@ class NewStruct(Instruccion):
         #defStruct = copy(entorno.getDefEstructura(self.nombre))
         defStruct = copy.deepcopy(entorno.getDefEstructura(self.nombre))
         latributos = defStruct.getLisAtributo()
-        print(f'NewStruct_ejec: {defStruct.getLisAtributo().get("name").valor}')
+        #print(f'NewStruct_ejec: {defStruct.getLisAtributo().get("name").valor}')
         #print(f'NewStruct_ejec: viene{len(valor)}, org:{len(latributos)}')
         if len(latributos) == len(valor):
             #print(f'{latributos}')
@@ -27,8 +27,9 @@ class NewStruct(Instruccion):
                 #print(f'ident: {ident}, valor:{value.valor} tipo: {value.tipo}')
                 if ident in latributos:
                     svalue = latributos.get(ident)
-                    print(f'svalue: {type(svalue)}')
+                    #print(f'svalue: {type(svalue.tipo)}')
                     if value.tipo == svalue.tipo:
+                        #print(f'newstruct: {value.tipo}')
                         latributos.update({ident: value})
                     else:
                         print(f'Error_NewStruct_Tipo: El tipo no coincide con el definido en la estructura')
