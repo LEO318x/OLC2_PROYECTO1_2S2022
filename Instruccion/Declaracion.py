@@ -1,6 +1,7 @@
 from Abstract.Instruccion import Instruccion
+from Error.Error import Error
 from Simbolo.Tipo import TIPO_DATO
-
+from Error.Errores import lerrores
 
 class Declaracion(Instruccion):
     def __init__(self, id, valor, mutable, fila, columna):
@@ -29,5 +30,6 @@ class Declaracion_Tipo(Instruccion):
             entorno.guardar_var_tipo(self.id, val.valor, self.tipo, self.mutable)
         else:
             print(f'Error_decla_tipo_ejecutar: La variable "{self.id}" a declarar no coincide con el tipo de dato')
+            lerrores.append(Error(self.fila, self.columna, 'Global', 'La variable a declarar no es del mismo tipo'))
         #print(f'Decla: {val.tipo}')
 

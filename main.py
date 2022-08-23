@@ -1,12 +1,16 @@
 import tkinter
 from tkinter import Tk, Frame, Menu, messagebox, Text, Button, Label, filedialog
 
+import Error.Errores
+from aSintactico import analizar
+
+
 class Ventana:
     def __init__(self, master=None):
         self.master = master
         self.master.title("OLC2_Proyecto1_2S2022")
 
-        #Tamaño de nuestra ventana
+        # Tamaño de nuestra ventana
         self.window_width = 1280
         self.window_height = 720
 
@@ -78,9 +82,9 @@ class Ventana:
     def fncAnalizar(self):
         self.txtSalida.delete(1.0, tkinter.END)
         txt = self.txtEntrada.get('1.0', 'end-1c')
-        from aSintactico import analizar
         analizar(txt)
-        #self.txtSalida.insert(tkinter.END, txt)
+        #print(f"Errores encontrrados{Error.Errores.lerrores}")
+        # self.txtSalida.insert(tkinter.END, txt)
 
     @staticmethod
     def acerca_de():
@@ -89,6 +93,7 @@ class Ventana:
     @staticmethod
     def salir() -> None:
         exit()
+
 
 root = Tk()
 miVentana = Ventana(root)

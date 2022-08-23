@@ -33,4 +33,7 @@ class Print(Instruccion):
         else:
             for expresion in tmpls:
                 valor = expresion.ejecutar(entorno)
-                print(f"{valor.valor}")
+                if valor.tipo != TIPO_DATO.STRUCT:
+                    print(f"{valor.valor}")
+                else:
+                    print(f'Error al imprimir')

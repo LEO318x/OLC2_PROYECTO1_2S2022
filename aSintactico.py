@@ -36,6 +36,9 @@ from Instruccion.Continue import Continue
 from Expresion.Literal import Literal
 from Simbolo.Tipo import *
 from Expresion.Aritmetica import Aritmetica
+import Error.Errores
+
+input = ""
 
 # Asociación de operadores y precedencia
 precedence = (
@@ -90,22 +93,77 @@ def p_instruccion(t):
 
 
 def p_declaracion(t):
-    '''declaracion : LET ID IGUAL expresion PTOCOMA
-                   | LET MUT ID IGUAL expresion PTOCOMA'''
+    '''declaracion : LET ID IGUAL term PTOCOMA
+                   | LET MUT ID IGUAL term PTOCOMA'''
     if t.slice[2].type == 'MUT':
         t[0] = Declaracion(t[3], t[5], True, t.lineno(4), find_column(input, t.slice[4]))
     else:
         t[0] = Declaracion(t[2], t[4], False, t.lineno(3), find_column(input, t.slice[3]))
 
 
+def p_declaracion_struct(t):
+    '''declaracion : LET MUT ID IGUAL ID ILLAVE  strattrexpre DLLAVE PTOCOMA'''
+    t[0] = Declaracion(t[3], NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[5], t[7]), True, t.lineno(4), find_column(input, t.slice[4]))
+
+
+def p_declaracion_struct_nomut(t):
+    '''declaracion : LET ID IGUAL ID ILLAVE  strattrexpre DLLAVE PTOCOMA'''
+    t[0] = Declaracion(t[2], NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[4], t[6]), False, t.lineno(3), find_column(input, t.slice[3]))
+
+
+def p_strattrexpre(t):
+    '''strattrexpre : strattrexpre COMA strattrexpr '''
+    t[1].append(t[3])
+    t[0] = t[1]
+
+
+def p_strattrexpr(t):
+    '''strattrexpre : strattrexpr'''
+    t[0] = [t[1]]
+
+
+def p_strattrexpro(t):
+    '''strattrexpr : ID DOSPTOS expresion'''
+    t[0] = {t[1]: t[3]}
+
+
+def p_ksfjdkl(t):
+    '''strattrexpr : ID DOSPTOS expresion2'''
+    t[0] = {t[1]: t[3]}
+
+
+def p_strajfjsdk(t):
+    '''expresion2 : ID ILLAVE strattrexpre DLLAVE'''
+    t[0] = NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[1], t[3])
+
+
+def p_structcamp(t):
+    '''expresion : expresion PUNTO ID'''
+    t[0] = AccesoID(t.lineno(2), find_column(input, t.slice[2]), t[1], t[3])
+
+
 def p_declaracion_con_tipo(t):
-    '''declaracion_con_tipo : LET ID DOSPTOS tipo_dato IGUAL expresion PTOCOMA
-                            | LET MUT ID DOSPTOS tipo_dato IGUAL expresion PTOCOMA'''
+    '''declaracion_con_tipo : LET ID DOSPTOS tipo_dato IGUAL term PTOCOMA
+                            | LET MUT ID DOSPTOS tipo_dato IGUAL term PTOCOMA'''
     if t.slice[2].type == 'MUT':
         t[0] = Declaracion_Tipo(t[3], t[7], t[5], True, t.lineno(6), find_column(input, t.slice[6]))
     else:
         t[0] = Declaracion_Tipo(t[2], t[6], t[4], False, t.lineno(5), find_column(input, t.slice[5]))
 
+
+def p_declaracion_con_tipo_struct(t):
+    '''declaracion_con_tipo : LET MUT ID DOSPTOS tipo_dato IGUAL ID ILLAVE  strattrexpre DLLAVE PTOCOMA'''
+    t[0] = Declaracion_Tipo(t[3], NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[7], t[9]), t[5], True, t.lineno(1), find_column(input, t.slice[1]))
+
+
+def p_declaracion_con_tipo_struct_nomut(t):
+    '''declaracion_con_tipo : LET ID DOSPTOS tipo_dato IGUAL ID ILLAVE  strattrexpre DLLAVE PTOCOMA'''
+    t[0] = Declaracion_Tipo(t[2], NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[6], t[8]), t[4], False, t.lineno(1), find_column(input, t.slice[1]))
+
+
+def p_term(t):
+    '''term : expresion'''
+    t[0] = t[1]
 
 def p_structasig(t):
     '''structasig : lsacceso IGUAL expresion PTOCOMA'''
@@ -396,34 +454,6 @@ def p_llamarfncomoexpro(t):
     '''expresion : ID IPAR DPAR'''
     t[0] = LlamarExpr(t.lineno(1), find_column(input, t.slice[1]), t[1], [])
 
-def p_structexpre(t):
-    '''expresion : ID ILLAVE strattrexpre DLLAVE'''
-    t[0] = NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[1], t[3])
-
-
-def p_strattrexpre(t):
-    '''strattrexpre : strattrexpre COMA strattrexpr '''
-    t[1].append(t[3])
-    t[0] = t[1]
-
-
-def p_strattrexpr(t):
-    '''strattrexpre : strattrexpr'''
-    t[0] = [t[1]]
-
-def p_strattrexpro(t):
-    '''strattrexpr : ID DOSPTOS expresion'''
-    t[0] = {t[1]: t[3]}
-
-
-def p_structcamp(t):
-    '''expresion : expresion PUNTO ID'''
-    t[0] = AccesoID(t.lineno(2), find_column(input, t.slice[2]), t[1], t[3])
-
-
-def p_structasigvalor(t):
-    '''structasigvalor : '''
-
 
 def p_expresion_tostring(t):
     '''expresion : expresion PUNTO TO_STRING IPAR DPAR'''
@@ -492,9 +522,12 @@ parser = yacc.yacc()
 
 
 def analizar(entrada):
-    resultado = parser.parse(entrada)
+    #print(f'{entrada}')
+    input = entrada
+    resultado = parser.parse(input)
+    env = Entorno(None)
     for i in resultado:
-        i.ejecutar(None)
+        i.ejecutar(env)
 
 
 if __name__ == '__main__':

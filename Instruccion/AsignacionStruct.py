@@ -23,7 +23,10 @@ class AsignacionStruct(Instruccion):
 
             ultimo = self.ids[len(self.ids)-1]
             if ultimo in simbolo.valor:
-                simbolo.valor.update({ultimo: valor})
+                if simbolo.valor.get(ultimo).tipo == valor.tipo:
+                    simbolo.valor.update({ultimo: valor})
+                else:
+                    print(f'Error_AsigStruct: Tipo de dato no coincide con el definido en el struct')
             else:
                 print(f'Error_AsigStruct: El campo no existe en el struct, no se puede editar')
         else:
