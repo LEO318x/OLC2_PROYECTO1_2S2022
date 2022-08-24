@@ -11,6 +11,7 @@ class Declaracion(Instruccion):
         self.mutable = mutable
 
     def ejecutar(self, entorno):
+        #print(f'Decla: {type(self.valor)}')
         val = self.valor.ejecutar(entorno)
         #print(f'Decla: {val.tipo}')
         entorno.guardar(self.id, val.valor, val.tipo, self.mutable)

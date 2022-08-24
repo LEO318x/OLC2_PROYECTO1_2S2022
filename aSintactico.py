@@ -1,12 +1,15 @@
 import ply.yacc as yacc
 from Abstract.Retorno import Retorno
 from Expresion.Acceso import Acceso
+from Expresion.AccesoArreglo import AccesoArreglo
 from Expresion.AccesoId import AccesoID
 from Expresion.Logica import Logica
 from Expresion.DefStruct import DefStruct
+from Expresion.NuevoArreglo import NuevoArreglo
 from Expresion.Relacional import Relacional
 from Instruccion.Asignacion import Asignacion
 from Instruccion.AsignacionStruct import AsignacionStruct
+from Instruccion.AsignarArreglo import AsignarArreglo
 from Instruccion.BuscarTipo import BuscarTipo
 from Instruccion.Casteo import Casteo
 from Instruccion.Declaracion import Declaracion, Declaracion_Tipo
@@ -93,20 +96,21 @@ def p_instruccion(t):
 
 
 def p_declaracion(t):
-    '''declaracion : LET ID IGUAL term PTOCOMA
-                   | LET MUT ID IGUAL term PTOCOMA'''
-    if t.slice[2].type == 'MUT':
-        t[0] = Declaracion(t[3], t[5], True, t.lineno(4), find_column(input, t.slice[4]))
-    else:
-        t[0] = Declaracion(t[2], t[4], False, t.lineno(3), find_column(input, t.slice[3]))
+    '''declaracion : LET ID IGUAL term PTOCOMA'''
+    t[0] = Declaracion(t[2], t[4], False, t.lineno(3), find_column(input, t.slice[3]))
 
 
-def p_declaracion_struct(t):
+def p_declaracion_mut(t):
+    '''declaracion : LET MUT ID IGUAL term PTOCOMA'''
+    t[0] = Declaracion(t[3], t[5], True, t.lineno(4), find_column(input, t.slice[4]))
+
+
+def p_declaracion_struct_mut(t):
     '''declaracion : LET MUT ID IGUAL ID ILLAVE  strattrexpre DLLAVE PTOCOMA'''
     t[0] = Declaracion(t[3], NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[5], t[7]), True, t.lineno(4), find_column(input, t.slice[4]))
 
 
-def p_declaracion_struct_nomut(t):
+def p_declaracion_struct(t):
     '''declaracion : LET ID IGUAL ID ILLAVE  strattrexpre DLLAVE PTOCOMA'''
     t[0] = Declaracion(t[2], NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[4], t[6]), False, t.lineno(3), find_column(input, t.slice[3]))
 
@@ -127,12 +131,12 @@ def p_strattrexpro(t):
     t[0] = {t[1]: t[3]}
 
 
-def p_ksfjdkl(t):
+def p_strattrexpro2(t):
     '''strattrexpr : ID DOSPTOS expresion2'''
     t[0] = {t[1]: t[3]}
 
 
-def p_strajfjsdk(t):
+def p_strexpr2(t):
     '''expresion2 : ID ILLAVE strattrexpre DLLAVE'''
     t[0] = NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[1], t[3])
 
@@ -143,20 +147,21 @@ def p_structcamp(t):
 
 
 def p_declaracion_con_tipo(t):
-    '''declaracion_con_tipo : LET ID DOSPTOS tipo_dato IGUAL term PTOCOMA
-                            | LET MUT ID DOSPTOS tipo_dato IGUAL term PTOCOMA'''
-    if t.slice[2].type == 'MUT':
-        t[0] = Declaracion_Tipo(t[3], t[7], t[5], True, t.lineno(6), find_column(input, t.slice[6]))
-    else:
-        t[0] = Declaracion_Tipo(t[2], t[6], t[4], False, t.lineno(5), find_column(input, t.slice[5]))
+    '''declaracion_con_tipo : LET ID DOSPTOS tipo_dato IGUAL term PTOCOMA'''
+    t[0] = Declaracion_Tipo(t[2], t[6], t[4], False, t.lineno(5), find_column(input, t.slice[5]))
 
 
-def p_declaracion_con_tipo_struct(t):
+def p_declaracion_con_tipo_mut(t):
+    '''declaracion_con_tipo : LET MUT ID DOSPTOS tipo_dato IGUAL term PTOCOMA'''
+    t[0] = Declaracion_Tipo(t[3], t[7], t[5], True, t.lineno(6), find_column(input, t.slice[6]))
+
+
+def p_declaracion_con_tipo_struct_mut(t):
     '''declaracion_con_tipo : LET MUT ID DOSPTOS tipo_dato IGUAL ID ILLAVE  strattrexpre DLLAVE PTOCOMA'''
     t[0] = Declaracion_Tipo(t[3], NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[7], t[9]), t[5], True, t.lineno(1), find_column(input, t.slice[1]))
 
 
-def p_declaracion_con_tipo_struct_nomut(t):
+def p_declaracion_con_tipo_struct(t):
     '''declaracion_con_tipo : LET ID DOSPTOS tipo_dato IGUAL ID ILLAVE  strattrexpre DLLAVE PTOCOMA'''
     t[0] = Declaracion_Tipo(t[2], NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[6], t[8]), t[4], False, t.lineno(1), find_column(input, t.slice[1]))
 
@@ -177,7 +182,6 @@ def p_lstasig(t):
 def p_lsasigo(t):
     '''lsacceso : ID PUNTO ID'''
     t[0] = [t[1], t[3]]
-
 
 def p_tipo_dato(t):
     '''tipo_dato : I64
@@ -210,10 +214,14 @@ def p_tipo_dato(t):
                 tipo = TIPO_DATO.TYPE
     t[0] = tipo
 
+
 def p_asignacion(t):
     '''asignacion : ID IGUAL expresion PTOCOMA'''
     t[0] = Asignacion(t[1], t[3], t.lineno(1), find_column(input, t.slice[1]))
 
+# def p_asignacion(t):
+#     '''asignacion : expresion ICOR expresion DCOR IGUAL expresion PTOCOMA'''
+#     t[0] = AsignarArreglo(t.lineno(2), find_column(input, t.slice[2]), t[1], t[3], t[6])
 
 def p_ifst(t):
     '''ifst : IF expresion st elsest'''
@@ -478,6 +486,28 @@ def p_expresion_abs(t):
 def p_expresion_sqrt(t):
     '''expresion : expresion PUNTO SQRT IPAR DPAR'''
     t[0] = Sqrt(t.lineno(2), find_column(input, t.slice[2]), t[1])
+
+
+def p_array(t):
+    '''expresion : ICOR laexpre DCOR'''
+    t[0] = NuevoArreglo(t.lineno(1), find_column(input, t.slice[1]), t[2])
+    #t[0] = NuevoArreglo(t.lineno(1), find_column(input, t.slice[1]), t[2])
+
+
+def p_lexpre(t):
+    '''laexpre : laexpre COMA expresion'''
+    t[1].append(t[3])
+    t[0] = t[1]
+
+
+def p_lexpreo(t):
+    '''laexpre : expresion'''
+    t[0] = [t[1]]
+
+
+def p_arregloacceso(t):
+    '''expresion : expresion ICOR expresion DCOR'''
+    t[0] = AccesoArreglo(t.lineno(2), find_column(input, t.slice[2]), t[1], t[3])
 
 
 def p_expresion_primitiva(t):
