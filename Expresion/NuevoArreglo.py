@@ -9,6 +9,7 @@ class NuevoArreglo(Expresion):
     def __init__(self, fila, columna, listaexpre):
         super().__init__(fila, columna)
         self.listaexpre = listaexpre
+        self.tipo = ""
 
     def ejecutar(self, entorno):
         lexpresiones = self.listaexpre

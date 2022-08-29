@@ -18,6 +18,7 @@ from Instruccion.Funcion import Funcion
 from Instruccion.Llamar import Llamar
 from Instruccion.LlamarExpr import LlamarExpr
 from Instruccion.Loop import Loop
+from Instruccion.Main import Main
 from Instruccion.Match import Match
 from Instruccion.NewStruct import NewStruct
 from Instruccion.Return import Return
@@ -64,15 +65,37 @@ def p_init(t):
 
 
 def p_lista_instrucciones(t):
-    'instrucciones : instrucciones instruccion'
+    'instrucciones : instrucciones instrucciones_globales'
     t[1].append(t[2])
     t[0] = t[1]
 
 
 def p_instrucciones_instruccion(t):
-    'instrucciones : instruccion'
+    'instrucciones : instrucciones_globales'
     t[0] = [t[1]]
 
+
+def p_instrucciones_globales(t):
+    '''instrucciones_globales : structdef
+                              | fnmain
+                              | fnst
+                              | fnwretst'''
+    t[0] = t[1]
+
+def p_instruccion_main(t):
+    '''fnmain : FN MAIN IPAR DPAR ILLAVE instrucciones_main DLLAVE'''
+    t[0] = Main(t.lineno(1), find_column(input, t.slice[1]), t[6])
+
+
+
+def p_lista_instrucciones_main(t):
+    '''instrucciones_main : instrucciones_main instruccion'''
+    t[1].append(t[2])
+    t[0] = t[1]
+
+def p_instrucciones_instruccion_main(t):
+    'instrucciones_main : instruccion'
+    t[0] = [t[1]]
 
 def p_instruccion(t):
     '''instruccion : declaracion
@@ -83,8 +106,6 @@ def p_instruccion(t):
                   | whilest
                   | loopst
                   | forinst
-                  | fnst
-                  | fnwretst
                   | llamarfn PTOCOMA
                   | print_inst
                   | breakinst PTOCOMA
@@ -329,10 +350,10 @@ def p_llparamso(t):
 
 
 def p_st(t):
-    '''st : ILLAVE instrucciones DLLAVE
+    '''st : ILLAVE instrucciones_main DLLAVE
           | ILLAVE DLLAVE'''
     # print(f't[2]: {t.slice[2].type}')
-    if t.slice[2].type == 'instrucciones':
+    if t.slice[2].type == 'instrucciones_main':
         t[0] = Sentencia(t.lineno(1), find_column(input, t.slice[1]), t[2])
     else:
         t[0] = Sentencia(t.lineno(1), find_column(input, t.slice[1]), None)
