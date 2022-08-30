@@ -1,5 +1,7 @@
 from Abstract.Expresion import Expresion
 from Abstract.Retorno import Retorno
+from Error.Error import Error
+from Reporte.Reportes import lerrores
 
 
 class Acceso(Expresion):
@@ -15,5 +17,6 @@ class Acceso(Expresion):
             #print(f'Acc_Eje: {valor}')
             return Retorno(valor.valor, valor.tipo)
         else:
+            lerrores.append(Error(self.fila, self.columna, entorno.nombre, 'La variable no existe'))
             print(f'Error_Acc, la variable "{self.id}" no existe')
             return None

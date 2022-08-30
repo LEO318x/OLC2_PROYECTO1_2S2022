@@ -54,7 +54,7 @@ class Ventana:
         reportesMenu.add_command(label='Reporte de errores', command='')
         reportesMenu.add_command(label='Reporte de base de datos', command='')
         reportesMenu.add_command(label='Reporte de tablas de base de datos', command='')
-        menu.add_cascade(label='Reportes', menu=reportesMenu)
+        menu.add_cascade(label='Reportes.py', menu=reportesMenu)
 
         ayudaMenu = Menu(menu, tearoff=0)
         ayudaMenu.add_command(label='Acerca de', command=self.acerca_de)

@@ -1,4 +1,6 @@
 from Abstract.Instruccion import Instruccion
+from Error.Error import Error
+from Reporte.Reportes import lerrores
 from Simbolo.Tipo import TIPO_DATO
 
 
@@ -27,8 +29,10 @@ class Print(Instruccion):
                     tmpprint = tmpexpr.valor.format(*lstemp)
                     print(f'{tmpprint}')
                 except:
+                    lerrores.append(Error(self.fila, self.columna, entorno.nombre, f'Error_Print: ¿¿¿Misma cantidad de expresiones y ' + "{}{:?} o tipo dato no coincide con {}{:?} ???"))
                     print(f'Error_Print: ¿¿¿Misma cantidad de expresiones y', "{}{:?} o tipo dato no coincide con {}{:?} ???")
             else:
+                lerrores.append(Error(self.fila, self.columna, entorno.nombre, f'imp_error: Falta', "{} {:?}"))
                 print(f'imp_error: Falta', "{} {:?}")
         else:
             for expresion in tmpls:
@@ -36,4 +40,5 @@ class Print(Instruccion):
                 if valor.tipo != TIPO_DATO.STRUCT:
                     print(f"{valor.valor}")
                 else:
+                    lerrores.append(Error(self.fila, self.columna, entorno.nombre, 'Error al imprimir'))
                     print(f'Error al imprimir')

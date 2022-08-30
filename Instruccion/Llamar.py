@@ -12,7 +12,7 @@ class Llamar(Instruccion):
         #print(f'llamar_ejec {self.id}')
         func = entorno.getFuncion(self.id)
         if func != None:
-            nuevoEntorno = Entorno(entorno.getGlobal())
+            nuevoEntorno = Entorno(self.id, entorno.getGlobal())
 
             for i in range(len(self.parametros)):
                 #print(f'{i}')

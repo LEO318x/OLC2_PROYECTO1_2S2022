@@ -3,7 +3,8 @@ from Simbolo.Simbolo import Simbolo
 
 
 class Entorno:
-    def __init__(self, anterior=None):
+    def __init__(self, nombre, anterior=None):
+        self.nombre = nombre
         self.variables = {}
         self.funciones = dict()
         self.estructuras = dict()

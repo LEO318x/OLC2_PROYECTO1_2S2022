@@ -1,5 +1,6 @@
 from Abstract.Expresion import Expresion
 from Abstract.Retorno import Retorno
+from Reporte.Reportes import lsimbolos
 from Simbolo.Arreglo import Arreglo
 from Simbolo.Simbolo import Simbolo
 from Simbolo.Tipo import TIPO_DATO

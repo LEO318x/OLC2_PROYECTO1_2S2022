@@ -1,5 +1,6 @@
 from Abstract.Instruccion import Instruccion
 from Abstract.Retorno import Retorno
+from Reporte.Reportes import lsimbolos
 from Simbolo.Tipo import TIPO_DATO
 
 

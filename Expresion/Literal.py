@@ -1,5 +1,7 @@
 from Abstract.Expresion import Expresion
 from Abstract.Retorno import Retorno
+from Error.Error import Error
+from Reporte.Reportes import lerrores
 from Simbolo.Tipo import *
 
 
@@ -23,6 +25,7 @@ class Literal(Expresion):
         elif self.tipo == TIPO_DATO.CHAR:
             if len(self.valor) > 1:
                 tmpchar = self.valor
+                lerrores.append(Error(self.fila, self.columna, entorno.nombre, 'Char no puede ser mayor a 1'))
                 print(f'Error_Lit: Char no puede ser > 1')
                 return Retorno(tmpchar[0:1], TIPO_DATO.CHAR)
             else:

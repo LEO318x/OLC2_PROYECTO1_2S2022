@@ -12,12 +12,13 @@ class TIPO_DATO(Enum):
     ARRAY = 8
     VECT = 9
     STRUCT = 10
-    BREAK = 11
-    CONTINUE = 12
-    RETURN = 13
-    RSTR = 14
-    TYPE = 15
-    ERROR = 16
+    FUNC = 11
+    BREAK = 12
+    CONTINUE = 13
+    RETURN = 14
+    RSTR = 15
+    TYPE = 16
+    ERROR = 17
 
 class TIPO_OPERACION(Enum):
     SUMA = 1

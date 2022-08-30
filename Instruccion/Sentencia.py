@@ -8,7 +8,7 @@ class Sentencia(Instruccion):
         self.sentencias = sentencias
 
     def ejecutar(self, entorno):
-        nuevoEntorno = Entorno(entorno)
+        nuevoEntorno = Entorno(entorno.nombre, entorno)
         for instr in self.sentencias:
             elemento = instr.ejecutar(nuevoEntorno)
             if elemento is not None:

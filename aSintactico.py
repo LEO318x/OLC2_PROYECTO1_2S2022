@@ -40,7 +40,7 @@ from Instruccion.Continue import Continue
 from Expresion.Literal import Literal
 from Simbolo.Tipo import *
 from Expresion.Aritmetica import Aritmetica
-import Error.Errores
+from Reporte.Reportes import generarReporteSimbolos, generarReporteErrores
 
 input = ""
 
@@ -576,7 +576,7 @@ def analizar(entrada):
     #print(f'{entrada}')
     input = entrada
     resultado = parser.parse(input)
-    env = Entorno(None)
+    env = Entorno("Global", None)
     for i in resultado:
         i.ejecutar(env)
 
@@ -586,6 +586,9 @@ if __name__ == '__main__':
 
     input = f.read()
     resultado = parser.parse(input)
-    env = Entorno(None)
+    env = Entorno("Global", None)
     for i in resultado:
         i.ejecutar(env)
+
+    generarReporteSimbolos()
+    generarReporteErrores()

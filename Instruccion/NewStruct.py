@@ -1,6 +1,8 @@
 import copy
 from Abstract.Instruccion import Instruccion
 from Abstract.Retorno import Retorno
+from Error.Error import Error
+from Reporte.Reportes import lerrores
 from Simbolo.Tipo import TIPO_DATO
 
 
@@ -32,10 +34,13 @@ class NewStruct(Instruccion):
                         #print(f'newstruct: {value.tipo}')
                         latributos.update({ident: value})
                     else:
+                        lerrores.append(Error(self.fila, self.columna, entorno.nombre, 'El tipo no coincide con el definido en la estructura'))
                         print(f'Error_NewStruct_Tipo: El tipo no coincide con el definido en la estructura')
                         print(f'{value.tipo}, {svalue.tipo}')
                         return
                 else:
+                    lerrores.append(Error(self.fila, self.columna, entorno.nombre,
+                                          'El nombre no coincide con el definido en la estructura'))
                     print(f'Error_NewStruct_Par: El nombre no coincide con el definido en la estructura')
                     return
             return Retorno(latributos, TIPO_DATO.STRUCT)
@@ -46,4 +51,5 @@ class NewStruct(Instruccion):
             #    tipo = latributos.get(key)
             #    print(f'xdddd{tipo}')
         else:
+            lerrores.append(Error(self.fila, self.columna, entorno.nombre, 'Faltan parametros en la estructura'))
             print(f'Error_NewStruct_Par: Faltan parametros en la estructura')

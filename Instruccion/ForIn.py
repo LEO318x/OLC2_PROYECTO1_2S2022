@@ -1,4 +1,6 @@
 from Abstract.Instruccion import Instruccion
+from Error.Error import Error
+from Reporte.Reportes import lerrores
 from Simbolo.Entorno import Entorno
 from Simbolo.Tipo import TIPO_DATO
 
@@ -18,7 +20,7 @@ class ForIn(Instruccion):
 
         if inicio.tipo == TIPO_DATO.INTEGER:
             if final.tipo == TIPO_DATO.INTEGER:
-                nuevo_entorno = Entorno(entorno)
+                nuevo_entorno = Entorno("For", entorno)
                 for value in range(inicio.valor, final.valor):
                     nuevo_entorno.guardar_var_tipo(self.id, value, TIPO_DATO.INTEGER, True)
                     #print(f'forin_ejec: {self.instrucciones.ejecutar(nuevo_entorno)}')
@@ -33,7 +35,9 @@ class ForIn(Instruccion):
                             #return elemento
                             pass
             else:
+                lerrores.append(Error(self.fila, self.columna, entorno.nombre, f'Error_ForIN: El limite inferior debe ser de: {TIPO_DATO.INTEGER} y NO {inicio.tipo}'))
                 print(f'Error_ForIN: El limite inferior debe ser de: {TIPO_DATO.INTEGER} y NO {inicio.tipo}')
         else:
+            lerrores.append(Error(self.fila, self.columna, entorno.nombre, f'Error_ForIN: El limite superior debe ser de: {TIPO_DATO.INTEGER} y NO {final.tipo}'))
             print(f'Error_ForIN: El limite superior debe ser de: {TIPO_DATO.INTEGER} y NO {final.tipo}')
 

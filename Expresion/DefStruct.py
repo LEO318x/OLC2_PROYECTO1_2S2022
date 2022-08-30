@@ -1,5 +1,6 @@
 from Abstract.Expresion import Expresion
 from Abstract.Retorno import Retorno
+from Reporte.Reportes import lsimbolos
 from Simbolo.Simbolo import Simbolo
 from Simbolo.Struct import Struct
 from Simbolo.Tipo import TIPO_DATO
@@ -17,5 +18,6 @@ class DefStruct(Expresion):
         for atributo in self.atributos:
             newStruct.setAtributo(atributo)
         env = entorno.getGlobal()
+        lsimbolos.append((self.nombre, "Struct", "TIPO_DATO.STRUCT", entorno.nombre, self.fila, self.columna))
         env.guardarEstructura(self.nombre, newStruct)
         #print(f"Struct: {newStruct.atributos}")
