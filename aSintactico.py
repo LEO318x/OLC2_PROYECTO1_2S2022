@@ -13,7 +13,7 @@ from Instruccion.AsignarArreglo import AsignarArreglo
 from Instruccion.BuscarTipo import BuscarTipo
 from Instruccion.Casteo import Casteo
 from Instruccion.Declaracion import Declaracion, Declaracion_Tipo
-from Instruccion.ForIn import ForIn
+from Instruccion.ForIn import ForIn, ForInAV
 from Instruccion.Funcion import Funcion
 from Instruccion.Llamar import Llamar
 from Instruccion.LlamarExpr import LlamarExpr
@@ -278,6 +278,7 @@ def p_forinst(t):
 
 def p_forinstexpr(t):
     '''forinst : FOR ID IN expresion st'''
+    t[0] = ForInAV(t.lineno(1), find_column(input, t.slice[1]), t[2], t[4], t[5])
 
 
 def p_breakinst(t):

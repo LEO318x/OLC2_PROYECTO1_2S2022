@@ -14,5 +14,8 @@ class Arreglo:
     def setAtributoConIndex(self, index, valor: Simbolo):
         self.valores[index] = valor
 
+    def getAtributos(self):
+        return self.valores
+
     def getTamanio(self):
         return len(self.valores)
