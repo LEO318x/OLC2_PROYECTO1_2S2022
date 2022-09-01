@@ -1,9 +1,8 @@
 import tkinter
-from tkinter import Tk, Frame, Menu, messagebox, Text, Button, Label, filedialog
+from tkinter import Tk, Frame, Menu, messagebox, Text, Button, Label, filedialog, INSERT
 
-import Error.Errores
 from aSintactico import analizar
-
+from Recolector.Recolector import recolector
 
 class Ventana:
     def __init__(self, master=None):
@@ -83,6 +82,9 @@ class Ventana:
         self.txtSalida.delete(1.0, tkinter.END)
         txt = self.txtEntrada.get('1.0', 'end-1c')
         analizar(txt)
+        for salida in recolector:
+            self.txtSalida.insert(INSERT, salida+"\n")
+        recolector.clear()
         #print(f"Errores encontrrados{Error.Errores.lerrores}")
         # self.txtSalida.insert(tkinter.END, txt)
 

@@ -26,6 +26,7 @@ from Instruccion.Sentencia import Sentencia
 from Nativas.Abs import Abs
 from Nativas.Clone import Clone
 from Nativas.Exponente import Exponente
+from Nativas.Len import Len
 from Nativas.Sqrt import Sqrt
 from Nativas.ToOwned import ToOwned
 from Nativas.ToString import ToString
@@ -207,6 +208,7 @@ def p_lsasigo(t):
 def p_tipo_dato(t):
     '''tipo_dato : I64
                  | F64
+                 | USIZE
                  | STRING
                  | RSTR
                  | CHAR
@@ -220,6 +222,8 @@ def p_tipo_dato(t):
             tipo = TIPO_DATO.INTEGER
         case 'f64':
             tipo = TIPO_DATO.FLOAT
+        case 'usize':
+            tipo = TIPO_DATO.INTEGER
         case 'bool':
             tipo = TIPO_DATO.BOOL
         case 'String':
@@ -235,14 +239,20 @@ def p_tipo_dato(t):
                 tipo = TIPO_DATO.TYPE
     t[0] = tipo
 
+def p_tipo_dato_arr(t):
+    '''tipo_dato : AMP MUT ICOR tipo_dato DCOR
+                | AMP MUT ICOR tipo_dato PTOCOMA expresion DCOR'''
+    t[0] = TIPO_DATO.ARRAY
+
 
 def p_asignacion(t):
     '''asignacion : ID IGUAL expresion PTOCOMA'''
     t[0] = Asignacion(t[1], t[3], t.lineno(1), find_column(input, t.slice[1]))
 
-# def p_asignacion(t):
-#     '''asignacion : expresion ICOR expresion DCOR IGUAL expresion PTOCOMA'''
-#     t[0] = AsignarArreglo(t.lineno(2), find_column(input, t.slice[2]), t[1], t[3], t[6])
+
+def p_asignacionarr(t):
+    '''asignacion : expresion ICOR expresion DCOR IGUAL expresion PTOCOMA'''
+    t[0] = AsignarArreglo(t.lineno(2), find_column(input, t.slice[2]), t[1], t[3], t[6])
 
 def p_ifst(t):
     '''ifst : IF expresion st elsest'''
@@ -435,6 +445,10 @@ def p_expresion_agrupacion(t):
     'expresion : IPAR expresion DPAR'
     t[0] = t[2]
 
+def p_arregloacceso(t):
+    '''expresion : expresion ICOR expresion DCOR'''
+    t[0] = AccesoArreglo(t.lineno(2), find_column(input, t.slice[2]), t[1], t[3])
+
 
 def p_expresion_relacional(t):
     '''expresion : expresion MAYORQ expresion
@@ -505,6 +519,11 @@ def p_expresion_abs(t):
     t[0] = Abs(t.lineno(2), find_column(input, t.slice[2]), t[1])
 
 
+def p_expresion_len(t):
+    '''expresion : expresion PUNTO LEN IPAR DPAR'''
+    t[0] = Len(t.lineno(2), find_column(input, t.slice[2]), t[1])
+
+
 def p_expresion_sqrt(t):
     '''expresion : expresion PUNTO SQRT IPAR DPAR'''
     t[0] = Sqrt(t.lineno(2), find_column(input, t.slice[2]), t[1])
@@ -525,11 +544,6 @@ def p_lexpre(t):
 def p_lexpreo(t):
     '''laexpre : expresion'''
     t[0] = [t[1]]
-
-
-def p_arregloacceso(t):
-    '''expresion : expresion ICOR expresion DCOR'''
-    t[0] = AccesoArreglo(t.lineno(2), find_column(input, t.slice[2]), t[1], t[3])
 
 
 def p_expresion_primitiva(t):

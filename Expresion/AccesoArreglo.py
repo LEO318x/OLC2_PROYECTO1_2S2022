@@ -12,7 +12,7 @@ class AccesoArreglo(Expresion):
         self.indice = indice
 
     def ejecutar(self, entorno):
-
+        #print(f'ACCARR: {self.anterior}')
         anterior = self.anterior.ejecutar(entorno)
         #print(f'anterior: {anterior.valor}')
         if anterior.tipo != TIPO_DATO.ARRAY:

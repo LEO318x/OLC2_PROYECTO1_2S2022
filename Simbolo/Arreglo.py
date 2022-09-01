@@ -19,3 +19,5 @@ class Arreglo:
 
     def getTamanio(self):
         return len(self.valores)
+
+

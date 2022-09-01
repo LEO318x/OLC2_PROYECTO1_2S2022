@@ -12,7 +12,8 @@ class AsignarArreglo(Instruccion):
         self.valor = valor
 
     def ejecutar(self, entorno):
-        nuevoValor = self.valor
+        #print(f'nuevov: {self.anterior}, indice: {self.indice}, valor: {self.valor}')
+        nuevoValor = self.valor.ejecutar(entorno)
         anterior = self.anterior.ejecutar(entorno)
         # print(f'anterior: {anterior.valor}')
         if anterior.tipo != TIPO_DATO.ARRAY:
@@ -24,6 +25,7 @@ class AsignarArreglo(Instruccion):
             print(f'Acceso_Arreglo_Error: El indice no es númerico')
             return Retorno("Error", TIPO_DATO.ERROR)
         if indice.valor < anterior.valor.getTamanio():
+            #print(f'AsigArreglo: {indice.valor}, nue: {nuevoValor.valor}')
             valor = anterior.valor.setAtributoConIndex(indice.valor, Simbolo('', nuevoValor.valor, nuevoValor.tipo, None))
         else:
             print(f'Acceso_Arreglo_Error: Indice del arreglo fuera de los límites')

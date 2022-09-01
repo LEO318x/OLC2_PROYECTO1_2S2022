@@ -18,7 +18,8 @@ class TIPO_DATO(Enum):
     RETURN = 14
     RSTR = 15
     TYPE = 16
-    ERROR = 17
+    USIZE = 17
+    ERROR = 18
 
 class TIPO_OPERACION(Enum):
     SUMA = 1

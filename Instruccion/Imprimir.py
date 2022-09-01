@@ -1,8 +1,10 @@
+import Simbolo.Arreglo
 from Abstract.Instruccion import Instruccion
 from Error.Error import Error
 from Reporte.Reportes import lerrores
 from Simbolo.Tipo import TIPO_DATO
-
+from Recolector.Recolector import recolector
+from Simbolo import Arreglo
 
 class Print(Instruccion):
 
@@ -22,11 +24,14 @@ class Print(Instruccion):
                 lstemp = []
                 for expresion in tmpls:
                     valor = expresion.ejecutar(entorno)
-                    lstemp.append(valor.valor)
-                    #print(f"{valor.valor}")
+                    if isinstance(valor.valor, Simbolo.Arreglo.Arreglo):
+                        lstemp.append(self.imprimirArreglo(valor.valor))
+                    else:
+                        lstemp.append(valor.valor)
                 try:
                     tmpls = tmplsaux
                     tmpprint = tmpexpr.valor.format(*lstemp)
+                    recolector.append(str(tmpprint))
                     print(f'{tmpprint}')
                 except:
                     lerrores.append(Error(self.fila, self.columna, entorno.nombre, f'Error_Print: ¿¿¿Misma cantidad de expresiones y ' + "{}{:?} o tipo dato no coincide con {}{:?} ???"))
@@ -38,7 +43,27 @@ class Print(Instruccion):
             for expresion in tmpls:
                 valor = expresion.ejecutar(entorno)
                 if valor.tipo != TIPO_DATO.STRUCT:
-                    print(f"{valor.valor}")
+                    if isinstance(valor.valor, Simbolo.Arreglo.Arreglo):
+                        recolector.append(self.imprimirArreglo(valor.valor))
+                        print(f"{self.imprimirArreglo(valor.valor)}")
+                    else:
+                        print(f"{valor.valor}")
                 else:
                     lerrores.append(Error(self.fila, self.columna, entorno.nombre, 'Error al imprimir'))
                     print(f'Error al imprimir')
+
+    def imprimirArreglo(self, arreglo):
+        tmp = "["
+        auxCount = 0
+        for x in arreglo.getAtributos():
+            if isinstance(x.valor, Simbolo.Arreglo.Arreglo):
+                ret = self.imprimirArreglo(x.valor)
+                tmp += str(ret)
+            else:
+                if auxCount == arreglo.getTamanio() - 1:
+                    tmp += str(x.valor)
+                else:
+                    tmp += str(x.valor) + ","
+            auxCount += 1
+        tmp += "]"
+        return tmp
