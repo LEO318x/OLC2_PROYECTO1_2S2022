@@ -53,7 +53,7 @@ class ForInAV(Instruccion):
     def ejecutar(self, entorno):
         expr = self.expresion.ejecutar(entorno)
 
-        if expr.tipo == TIPO_DATO.ARRAY:
+        if expr.tipo == TIPO_DATO.ARRAY or expr.tipo == TIPO_DATO.VECT:
             valor = expr.valor
             tamanio = expr.valor.getTamanio()
 

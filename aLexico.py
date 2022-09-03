@@ -84,7 +84,8 @@ reservadas = {
     'match': 'MATCH',
     'pow': 'POW',
     'powf': 'POWF',
-    'Vec': 'VEC'
+    'Vec': 'VEC',
+    'vec': 'VECD'
 }
 
 tokens = tokens + list(reservadas.values())
@@ -149,6 +150,9 @@ def t_ID(t):
         # print(f'tvalue: {t.value}, ttype: {t.type}')
     return t
 
+def t_COMENTARIO_MULTILINEA(t):
+    r'/\*(.|\n)*?\*/'
+    t.lexer.lineno += t.value.count('\n')
 
 def t_COMENT(t):
     r'//.*\n'

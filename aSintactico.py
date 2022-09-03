@@ -1,38 +1,42 @@
 import ply.yacc as yacc
 from Abstract.Retorno import Retorno
 from Expresion.Acceso import Acceso
-from Expresion.AccesoArreglo import AccesoArreglo
+from Expresion.AccesoArregloVector import AccesoArregloVector
 from Expresion.AccesoId import AccesoID
 from Expresion.Logica import Logica
 from Expresion.DefStruct import DefStruct
 from Expresion.NuevoArreglo import NuevoArreglo
+from Expresion.NuevoVector import NuevoVector
 from Expresion.Relacional import Relacional
 from Instruccion.Asignacion import Asignacion
 from Instruccion.AsignacionStruct import AsignacionStruct
 from Instruccion.AsignarArreglo import AsignarArreglo
-from Instruccion.BuscarTipo import BuscarTipo
 from Instruccion.Casteo import Casteo
 from Instruccion.Declaracion import Declaracion, Declaracion_Tipo
 from Instruccion.ForIn import ForIn, ForInAV
 from Instruccion.Funcion import Funcion
+from Instruccion.InsertVector import InsertVector
 from Instruccion.Llamar import Llamar
 from Instruccion.LlamarExpr import LlamarExpr
 from Instruccion.Loop import Loop
 from Instruccion.Main import Main
-from Instruccion.Match import Match
 from Instruccion.NewStruct import NewStruct
+from Instruccion.RemoveVector import RemoveVector
 from Instruccion.Return import Return
 from Instruccion.Sentencia import Sentencia
 from Nativas.Abs import Abs
+from Nativas.CapacityVector import CapacityVector
 from Nativas.Clone import Clone
 from Nativas.Exponente import Exponente
 from Nativas.Len import Len
+from Instruccion.PushVector import PushVector
 from Nativas.Sqrt import Sqrt
 from Nativas.ToOwned import ToOwned
 from Nativas.ToString import ToString
 from Simbolo.Entorno import Entorno
 from Simbolo.Simbolo import Simbolo
-from aLexico import tokens, analizador, find_column
+from aLexico import tokens, analizador
+from aLexico import find_column
 from Instruccion.Imprimir import Print
 from Instruccion.If import If
 from Instruccion.While import While
@@ -113,6 +117,8 @@ def p_instruccion(t):
                   | continueinst PTOCOMA
                   | returninst PTOCOMA
                   | structdef
+                  | vector_push PTOCOMA
+                  | vector_insert PTOCOMA
                   '''
     t[0] = t[1]
 
@@ -201,6 +207,7 @@ def p_lstasig(t):
     t[1].append(t[3])
     t[0] = t[1]
 
+
 def p_lsasigo(t):
     '''lsacceso : ID PUNTO ID'''
     t[0] = [t[1], t[3]]
@@ -239,10 +246,18 @@ def p_tipo_dato(t):
                 tipo = TIPO_DATO.TYPE
     t[0] = tipo
 
+
 def p_tipo_dato_arr(t):
     '''tipo_dato : AMP MUT ICOR tipo_dato DCOR
-                | AMP MUT ICOR tipo_dato PTOCOMA expresion DCOR'''
+                | AMP MUT ICOR tipo_dato PTOCOMA expresion DCOR
+                | ICOR tipo_dato PTOCOMA expresion DCOR'''
     t[0] = TIPO_DATO.ARRAY
+
+
+def p_tipo_dato_vector(t):
+    '''tipo_dato : AMP MUT VEC MENORQ tipo_dato MAYORQ
+                | VEC MENORQ tipo_dato MAYORQ'''
+    t[0] = TIPO_DATO.VECT
 
 
 def p_asignacion(t):
@@ -302,7 +317,8 @@ def p_continueinst(t):
 
 
 def p_returninst(t):
-    '''returninst : RETURN expresion'''
+    '''returninst : RETURN expresion
+                | RETURN expresion2 '''
     t[0] = Return(t.lineno(1), find_column(input, t.slice[1]), t[2])
 
 
@@ -392,6 +408,25 @@ def p_strattr(t):
     t[0] = {t[1]: Retorno('', t[3])}
 
 
+def p_vectoresdef(t):
+    '''instrvec : VECD NOT ICOR lsexprev DCOR'''
+    t[0] = NuevoVector(t.lineno(1), find_column(input, t.slice[1]), t[4])
+
+def p_lsexprev(t):
+    '''lsexprev : lsexprev COMA expresion'''
+    t[1].append(t[3])
+    t[0] = t[1]
+
+def p_lsexprevo(t):
+    '''lsexprev : expresion'''
+    t[0] = [t[1]]
+
+
+def p_exprev(t):
+    '''expresion : instrvec'''
+    t[0] = t[1]
+
+
 def p_print(t):
     '''print_inst : PRINTLN NOT IPAR lexpresion DPAR PTOCOMA'''
 
@@ -447,7 +482,7 @@ def p_expresion_agrupacion(t):
 
 def p_arregloacceso(t):
     '''expresion : expresion ICOR expresion DCOR'''
-    t[0] = AccesoArreglo(t.lineno(2), find_column(input, t.slice[2]), t[1], t[3])
+    t[0] = AccesoArregloVector(t.lineno(2), find_column(input, t.slice[2]), t[1], t[3])
 
 
 def p_expresion_relacional(t):
@@ -519,14 +554,50 @@ def p_expresion_abs(t):
     t[0] = Abs(t.lineno(2), find_column(input, t.slice[2]), t[1])
 
 
+def p_expresion_sqrt(t):
+    '''expresion : expresion PUNTO SQRT IPAR DPAR'''
+    t[0] = Sqrt(t.lineno(2), find_column(input, t.slice[2]), t[1])
+
+
 def p_expresion_len(t):
     '''expresion : expresion PUNTO LEN IPAR DPAR'''
     t[0] = Len(t.lineno(2), find_column(input, t.slice[2]), t[1])
 
 
-def p_expresion_sqrt(t):
-    '''expresion : expresion PUNTO SQRT IPAR DPAR'''
-    t[0] = Sqrt(t.lineno(2), find_column(input, t.slice[2]), t[1])
+def p_instr_pushv(t):
+    '''vector_push : ID PUNTO PUSH IPAR expresion DPAR
+                    | ID PUNTO PUSH IPAR expresion2 DPAR'''
+    t[0] = PushVector(t.lineno(3), find_column(input, t.slice[3]), t[1], t[5])
+
+
+def p_expresion_capacityv(t):
+    '''expresion : expresion PUNTO CAPACITY IPAR DPAR'''
+    t[0] = CapacityVector(t.lineno(3), find_column(input, t.slice[3]), t[1])
+
+
+def p_expresion_with_capacityv(t):
+    '''expresion : VEC DOSPTOS DOSPTOS WITH_CAPACITY IPAR expresion DPAR'''
+    t[0] = NuevoVector(t.lineno(1), find_column(input, t.slice[1]), [], t[6])
+
+
+def p_expresion_newv(t):
+    '''expresion : VEC DOSPTOS DOSPTOS NEW IPAR DPAR'''
+    t[0] = NuevoVector(t.lineno(1), find_column(input, t.slice[1]), [])
+
+
+# def p_instr_removev(t):
+#     '''vector_remove : ID PUNTO REMOVE IPAR expresion DPAR'''
+#     t[0] = RemoveVector(t.lineno(1), find_column(input, t.slice[1]), t[1], t[5])
+
+
+def p_expresion_removev(t):
+    '''expresion : expresion PUNTO REMOVE IPAR expresion DPAR'''
+    t[0] = RemoveVector(t.lineno(3), find_column(input, t.slice[3]), t[1], t[5])
+
+
+def p_instr_insertv(t):
+    ''' vector_insert : ID PUNTO INSERT IPAR expresion COMA expresion DPAR'''
+    t[0] = InsertVector(t.lineno(1), find_column(input, t.slice[1]), t[1], t[5], t[7])
 
 
 def p_array(t):
@@ -594,7 +665,8 @@ def analizar(entrada):
     env = Entorno("Global", None)
     for i in resultado:
         i.ejecutar(env)
-
+    generarReporteSimbolos()
+    generarReporteErrores()
 
 if __name__ == '__main__':
     f = open("./entrada1.txt", "r")

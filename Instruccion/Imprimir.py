@@ -47,6 +47,7 @@ class Print(Instruccion):
                         recolector.append(self.imprimirArreglo(valor.valor))
                         print(f"{self.imprimirArreglo(valor.valor)}")
                     else:
+                        recolector.append(valor.valor)
                         print(f"{valor.valor}")
                 else:
                     lerrores.append(Error(self.fila, self.columna, entorno.nombre, 'Error al imprimir'))

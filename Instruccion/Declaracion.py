@@ -32,7 +32,7 @@ class Declaracion_Tipo(Instruccion):
             lsimbolos.append((self.id, "Variable", self.tipo, entorno.nombre, self.fila, self.columna))
             entorno.guardar_var_tipo(self.id, val.valor, self.tipo, self.mutable)
         else:
-            print(f'Error_decla_tipo_ejecutar: La variable "{self.id}" a declarar no coincide con el tipo de dato')
+            print(f'Error_decla_tipo_ejecutar: La variable "{self.id}" a declarar no coincide con el tipo de dato {self.tipo} != {val.tipo}')
             lerrores.append(Error(self.fila, self.columna, 'Global', 'La variable a declarar no es del mismo tipo'))
         #print(f'Decla: {val.tipo}')
 

@@ -13,7 +13,7 @@ class NewStruct(Instruccion):
         self.struct = struct
 
     def ejecutar(self, entorno):
-        valor = self.struct
+        valor = copy.deepcopy(self.struct)
         #defStruct = copy(entorno.getDefEstructura(self.nombre))
         defStruct = copy.deepcopy(entorno.getDefEstructura(self.nombre))
         latributos = defStruct.getLisAtributo()
