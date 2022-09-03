@@ -1,5 +1,7 @@
 from Abstract.Expresion import Expresion
 from Abstract.Retorno import Retorno
+from Error.Error import Error
+from Reporte.Reportes import lerrores
 from Simbolo.Tipo import *
 
 class Exponente(Expresion):
@@ -21,6 +23,7 @@ class Exponente(Expresion):
             if TIPO_OPERACION.EXPO == self.tipo_operacion:
                 resultado = Retorno(valorIzq.valor ** valorDer.valor, TIPO_DATO.FLOAT)
         else:
+            lerrores.append(Error(self.fila, self.columna, entorno.nombre, f'Expo_Error: No coinciden los tipos {self.exprIzq.tipo} != {self.exprDer.tipo}'))
             print(f'Expo_Error: No coinciden los tipos {self.exprIzq.tipo} != {self.exprDer.tipo}')
             resultado = Retorno(0, TIPO_DATO.INTEGER)
         return resultado

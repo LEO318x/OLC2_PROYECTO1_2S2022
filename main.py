@@ -1,12 +1,15 @@
 import tkinter
-from tkinter import Tk, Frame, Menu, messagebox, Text, Button, Label, filedialog
+from tkinter import Tk, Frame, Menu, messagebox, Text, Button, Label, filedialog, INSERT
+
+from aSintactico import analizar
+from Recolector.Recolector import recolector
 
 class Ventana:
     def __init__(self, master=None):
         self.master = master
         self.master.title("OLC2_Proyecto1_2S2022")
 
-        #Tamaño de nuestra ventana
+        # Tamaño de nuestra ventana
         self.window_width = 1280
         self.window_height = 720
 
@@ -50,7 +53,7 @@ class Ventana:
         reportesMenu.add_command(label='Reporte de errores', command='')
         reportesMenu.add_command(label='Reporte de base de datos', command='')
         reportesMenu.add_command(label='Reporte de tablas de base de datos', command='')
-        menu.add_cascade(label='Reportes', menu=reportesMenu)
+        menu.add_cascade(label='Reportes.py', menu=reportesMenu)
 
         ayudaMenu = Menu(menu, tearoff=0)
         ayudaMenu.add_command(label='Acerca de', command=self.acerca_de)
@@ -78,9 +81,12 @@ class Ventana:
     def fncAnalizar(self):
         self.txtSalida.delete(1.0, tkinter.END)
         txt = self.txtEntrada.get('1.0', 'end-1c')
-        from aSintactico import analizar
         analizar(txt)
-        #self.txtSalida.insert(tkinter.END, txt)
+        for salida in recolector:
+            self.txtSalida.insert(INSERT, salida+"\n")
+        recolector.clear()
+        #print(f"Errores encontrrados{Error.Errores.lerrores}")
+        # self.txtSalida.insert(tkinter.END, txt)
 
     @staticmethod
     def acerca_de():
@@ -89,6 +95,7 @@ class Ventana:
     @staticmethod
     def salir() -> None:
         exit()
+
 
 root = Tk()
 miVentana = Ventana(root)

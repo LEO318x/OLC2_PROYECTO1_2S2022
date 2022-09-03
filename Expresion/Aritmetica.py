@@ -2,6 +2,8 @@ import math
 
 from Abstract.Expresion import Expresion
 from Abstract.Retorno import Retorno
+from Error.Error import Error
+from Reporte.Reportes import lerrores
 from Simbolo.Tipo import *
 
 
@@ -38,6 +40,7 @@ class Aritmetica(Expresion):
                 resultado = Retorno(valorIzq.valor * valorDer.valor, TIPO_DATO.INTEGER)
             elif TIPO_OPERACION.DIV == self.tipo_operacion:
                 if valorDer.valor == 0:
+                    lerrores.append(Error(self.fila, self.columna, entorno.nombre, 'No se puede dividir entre 0'))
                     print(f'No se puede dividir entre 0 >:(')
                     resultado = Retorno(0, TIPO_DATO.INTEGER)
                 else:
@@ -53,13 +56,24 @@ class Aritmetica(Expresion):
                 resultado = Retorno(valorIzq.valor * valorDer.valor, TIPO_DATO.FLOAT)
             elif TIPO_OPERACION.DIV == self.tipo_operacion:
                 if valorDer.valor == 0:
+                    lerrores.append(Error(self.fila, self.columna, entorno.nombre, 'No se puede dividir entre 0'))
                     print(f'No se puede dividir entre 0 >:(')
                     resultado = Retorno(0, TIPO_DATO.FLOAT)
                 else:
                     resultado = Retorno(valorIzq.valor / valorDer.valor, TIPO_DATO.FLOAT)
             elif TIPO_OPERACION.MOD == self.tipo_operacion:
                 resultado = Retorno(valorIzq.valor % valorDer.valor, TIPO_DATO.FLOAT)
+        elif TIPO_DATO.STRING == valorIzq.tipo and TIPO_DATO.RSTR == valorDer.tipo:
+                if TIPO_OPERACION.SUMA == self.tipo_operacion:
+                    resultado = Retorno(valorIzq.valor + valorDer.valor, TIPO_DATO.STRING)
+                    return resultado
+                else:
+                    lerrores.append(Error(self.fila, self.columna, entorno.nombre, 'Operacion no permitida'))
+                    print(f'Arit: Operacion no permitida')
+                    resultado = Retorno(0, TIPO_DATO.INTEGER)
+                return resultado
         else:
+            lerrores.append(Error(self.fila, self.columna, entorno.nombre, 'Los tipos de datos no coinciden'))
             print(f'Los tipos de datos no coinciden {valorIzq.tipo}!={valorDer.tipo}')
             resultado = Retorno(0, TIPO_DATO.INTEGER)
         return resultado
