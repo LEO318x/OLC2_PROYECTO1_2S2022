@@ -61,6 +61,7 @@ def generarReporteSimbolos():
     data = html + contenido + html2
     with open('reporte_simbolos.html', 'w', encoding='utf-8') as f:
         f.write(data)
+    lsimbolos.clear()
 
 
 
@@ -124,3 +125,4 @@ def generarReporteErrores():
     data = html + contenido + html2
     with open('reporte_errores.html', 'w', encoding='utf-8') as f:
         f.write(data)
+    lerrores.clear()

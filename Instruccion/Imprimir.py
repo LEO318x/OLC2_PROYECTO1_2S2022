@@ -5,6 +5,7 @@ from Reporte.Reportes import lerrores
 from Simbolo.Tipo import TIPO_DATO
 from Recolector.Recolector import recolector
 from Simbolo import Arreglo
+from Simbolo import Vector
 
 class Print(Instruccion):
 
@@ -24,8 +25,8 @@ class Print(Instruccion):
                 lstemp = []
                 for expresion in tmpls:
                     valor = expresion.ejecutar(entorno)
-                    if isinstance(valor.valor, Simbolo.Arreglo.Arreglo):
-                        lstemp.append(self.imprimirArreglo(valor.valor))
+                    if isinstance(valor.valor, Simbolo.Arreglo.Arreglo) or isinstance(valor.valor, Simbolo.Vector.Vector):
+                        lstemp.append(self.imprimirArregloVector(valor.valor))
                     else:
                         lstemp.append(valor.valor)
                 try:
@@ -43,9 +44,9 @@ class Print(Instruccion):
             for expresion in tmpls:
                 valor = expresion.ejecutar(entorno)
                 if valor.tipo != TIPO_DATO.STRUCT:
-                    if isinstance(valor.valor, Simbolo.Arreglo.Arreglo):
-                        recolector.append(self.imprimirArreglo(valor.valor))
-                        print(f"{self.imprimirArreglo(valor.valor)}")
+                    if isinstance(valor.valor, Simbolo.Arreglo.Arreglo) or isinstance(valor.valor, Simbolo.Vector.Vector):
+                        recolector.append(self.imprimirArregloVector(valor.valor))
+                        print(f"{self.imprimirArregloVector(valor.valor)}")
                     else:
                         recolector.append(valor.valor)
                         print(f"{valor.valor}")
@@ -53,12 +54,12 @@ class Print(Instruccion):
                     lerrores.append(Error(self.fila, self.columna, entorno.nombre, 'Error al imprimir'))
                     print(f'Error al imprimir')
 
-    def imprimirArreglo(self, arreglo):
+    def imprimirArregloVector(self, arreglo):
         tmp = "["
         auxCount = 0
         for x in arreglo.getAtributos():
-            if isinstance(x.valor, Simbolo.Arreglo.Arreglo):
-                ret = self.imprimirArreglo(x.valor)
+            if isinstance(x.valor, Simbolo.Arreglo.Arreglo) or isinstance(x.valor, Simbolo.Vector.Vector):
+                ret = self.imprimirArregloVector(x.valor)
                 tmp += str(ret)
             else:
                 if auxCount == arreglo.getTamanio() - 1:
@@ -66,5 +67,6 @@ class Print(Instruccion):
                 else:
                     tmp += str(x.valor) + ","
             auxCount += 1
+
         tmp += "]"
         return tmp
