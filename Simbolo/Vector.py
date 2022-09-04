@@ -19,7 +19,11 @@ class Vector:
         self.valores.append(valor)
 
     def setAtributoConIndex(self, index, valor: Simbolo):
-        self.valores[index] = valor
+        # print(f'vector: {index}')
+        try:
+            self.valores[index] = valor
+        except:
+            self.valores.append(valor)
 
     def setCapacidadMax(self, capacidad):
         self.tamanio_max = capacidad
@@ -38,8 +42,9 @@ class Vector:
     def getTamanioMax(self):
         return self.tamanio_max
 
-    def crear_vector(self, tamanio):
-        self.tamanio_max = tamanio
-        for i in range(0, tamanio):
-            self.valores.append(None)
+    def contains(self, valor):
+        for content in self.valores:
+            if content.valor == valor:
+                return True
+        return False
 

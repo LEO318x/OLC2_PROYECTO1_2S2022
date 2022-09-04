@@ -12,6 +12,7 @@ from Instruccion.Asignacion import Asignacion
 from Instruccion.AsignacionStruct import AsignacionStruct
 from Instruccion.AsignarArreglo import AsignarArreglo
 from Instruccion.Casteo import Casteo
+from Instruccion.ContainsVector import ContainsVector
 from Instruccion.Declaracion import Declaracion, Declaracion_Tipo
 from Instruccion.ForIn import ForIn, ForInAV
 from Instruccion.Funcion import Funcion
@@ -124,12 +125,12 @@ def p_instruccion(t):
 
 
 def p_declaracion(t):
-    '''declaracion : LET ID IGUAL term PTOCOMA'''
+    '''declaracion : LET ID IGUAL expresion PTOCOMA'''
     t[0] = Declaracion(t[2], t[4], False, t.lineno(3), find_column(input, t.slice[3]))
 
 
 def p_declaracion_mut(t):
-    '''declaracion : LET MUT ID IGUAL term PTOCOMA'''
+    '''declaracion : LET MUT ID IGUAL expresion PTOCOMA'''
     t[0] = Declaracion(t[3], t[5], True, t.lineno(4), find_column(input, t.slice[4]))
 
 
@@ -175,12 +176,12 @@ def p_structcamp(t):
 
 
 def p_declaracion_con_tipo(t):
-    '''declaracion_con_tipo : LET ID DOSPTOS tipo_dato IGUAL term PTOCOMA'''
+    '''declaracion_con_tipo : LET ID DOSPTOS tipo_dato IGUAL expresion PTOCOMA'''
     t[0] = Declaracion_Tipo(t[2], t[6], t[4], False, t.lineno(5), find_column(input, t.slice[5]))
 
 
 def p_declaracion_con_tipo_mut(t):
-    '''declaracion_con_tipo : LET MUT ID DOSPTOS tipo_dato IGUAL term PTOCOMA'''
+    '''declaracion_con_tipo : LET MUT ID DOSPTOS tipo_dato IGUAL expresion PTOCOMA'''
     t[0] = Declaracion_Tipo(t[3], t[7], t[5], True, t.lineno(6), find_column(input, t.slice[6]))
 
 
@@ -193,10 +194,6 @@ def p_declaracion_con_tipo_struct(t):
     '''declaracion_con_tipo : LET ID DOSPTOS tipo_dato IGUAL ID ILLAVE  strattrexpre DLLAVE PTOCOMA'''
     t[0] = Declaracion_Tipo(t[2], NewStruct(t.lineno(1), find_column(input, t.slice[1]), t[6], t[8]), t[4], False, t.lineno(1), find_column(input, t.slice[1]))
 
-
-def p_term(t):
-    '''term : expresion'''
-    t[0] = t[1]
 
 def p_structasig(t):
     '''structasig : lsacceso IGUAL expresion PTOCOMA'''
@@ -594,6 +591,10 @@ def p_expresion_removev(t):
     '''expresion : expresion PUNTO REMOVE IPAR expresion DPAR'''
     t[0] = RemoveVector(t.lineno(3), find_column(input, t.slice[3]), t[1], t[5])
 
+def p_expresion_containsv(t):
+    '''expresion : expresion PUNTO CONTAINS IPAR expresion DPAR'''
+    t[0] = ContainsVector(t.lineno(3), find_column(input, t.slice[3]), t[1], t[5])
+
 
 def p_instr_insertv(t):
     ''' vector_insert : ID PUNTO INSERT IPAR expresion COMA expresion DPAR'''
@@ -616,6 +617,10 @@ def p_lexpreo(t):
     '''laexpre : expresion'''
     t[0] = [t[1]]
 
+
+# .------------------------.
+# | Expresiones Primitivas |
+# '------------------------'
 
 def p_expresion_primitiva(t):
     '''expresion : NUMBER
